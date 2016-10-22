@@ -47,7 +47,7 @@ crashlytics-build.properties
 fabric.properties
 ### Gradle template
 .gradle
-/gradle/
+gradle/
 settings.gradle
 build/
 
