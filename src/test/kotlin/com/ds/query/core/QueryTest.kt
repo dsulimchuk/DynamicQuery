@@ -111,4 +111,4 @@ class QueryTest {
 
 }
 
-data class TestParam(val a: String, val b: String, val c: String?)
+data class TestParam(val a: String?, val b: String?, val c: String?)

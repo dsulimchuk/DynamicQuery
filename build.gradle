@@ -12,26 +12,24 @@ buildscript {
     }
 }
 
-//apply plugin: 'java'
 apply plugin: 'kotlin'
-
-sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    //jcenter()
 }
-
 
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "io.github.microutils:kotlin-logging:1.4"
 
+    compile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final"
 
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.+'
-    compile "ch.qos.logback:logback-classic:1.1.7"
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile 'junit:junit:4.12'
+    testCompile "ch.qos.logback:logback-classic:1.1.+"
+    testCompile 'org.hibernate:hibernate-core:5.2.3.Final'
 
-
+    testCompile 'com.h2database:h2:1.4.191'
+    compile 'commons-beanutils:commons-beanutils:1.9.2'
 }
-
