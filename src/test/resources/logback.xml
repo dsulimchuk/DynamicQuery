@@ -1,4 +1,5 @@
-<configuration>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="http://www.padual.com/java/logback.xsd">
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -6,7 +7,10 @@
         </encoder>
     </appender>
 
-    <root level="DEBUG">
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+
+
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

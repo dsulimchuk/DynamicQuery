@@ -13,7 +13,7 @@ import java.util.*
 
 fun main(args: Array<String>) {
     val query = UserRepository.getDyncmicQuery(SearchCriteria(null, "viktor", Date(), null))
-    println(query.prepare())
+    println(query.prepareText())
     Query("")
 }
 

@@ -37,7 +37,7 @@ class Query<T : Any> {
     }
 
 
-    fun prepare(): String {
+    fun prepareText(): String {
         var result = sourceQuery
         val preparedMacroses = prepareMacroses()
 

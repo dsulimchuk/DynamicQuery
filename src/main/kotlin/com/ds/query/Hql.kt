@@ -7,9 +7,9 @@ import javax.persistence.EntityManager
 
 /**
  * @author Dmitrii Sulimchuk
- * created 23/10/16
+ * created 26/10/16
  */
-class Sql<T : Any>(val entityManager: EntityManager,
+class Hql<T : Any>(val entityManager: EntityManager,
                    val initQuery: Query<T>.() -> Unit)
 : AbstractDialect() {
     companion object : KLogging()
@@ -19,19 +19,19 @@ class Sql<T : Any>(val entityManager: EntityManager,
         query.initQuery()
 
         val queryText = query.prepareText()
-        val result = entityManager.createNativeQuery(queryText)
+        val result = entityManager.createQuery(queryText)
 
         val allParameters = findAllQueryParameters(queryText)
 
         if (allParameters.isNotEmpty()) {
             if (allParameters.size == 1 && isBaseType(query.parameter)) {
-                logger.debug { "set parameter ${allParameters[0]} to ${query.parameter}" }
+                Sql.logger.debug { "set parameter ${allParameters[0]} to ${query.parameter}" }
                 result.setParameter(allParameters[0], query.parameter)
             } else {
                 allParameters
                         .map { it to BeanUtils.getProperty(query.parameter, it) }
                         .forEach {
-                            logger.debug { "set parameter ${it.first} to ${it.second}" }
+                            Sql.logger.debug { "set parameter ${it.first} to ${it.second}" }
                             result.setParameter(it.first, it.second)
                         }
             }
@@ -39,7 +39,4 @@ class Sql<T : Any>(val entityManager: EntityManager,
 
         return result
     }
-
-
-
 }

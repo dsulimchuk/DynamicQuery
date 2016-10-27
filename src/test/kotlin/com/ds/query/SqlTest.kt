@@ -32,10 +32,8 @@ class SqlTest {
 
     @Test
     fun testQueryWithOneParameter() {
-        val list = Sql(em, query(6) {
-            +"select 1 from dual where :parameter.aa.b = 6"
-        })
-                .prepare()
+        val list = Sql<Long>(em) { +"select 1 from dual where :parameter.aa.b = 6" }
+                .prepare(6)
                 .resultList as List<Long>
 
         assertThat(list, notNullValue())
@@ -46,10 +44,8 @@ class SqlTest {
     fun testQueryWithSeveralParameter() {
         data class SearchCriteria(val a: Long, val b: Long, val c: Long)
 
-        val list = Sql(em, query(SearchCriteria(1, 2, 3)) {
-            +"select 1 from dual where :a = 1 and :b = 2 and :c = 3"
-        })
-                .prepare()
+        val list = Sql<SearchCriteria>(em) { +"select 1 from dual where :a = 1 and :b = 2 and :c = 3" }
+                .prepare(SearchCriteria(1, 2, 3))
                 .resultList as List<Long>
 
         assertThat(list, notNullValue())
@@ -58,10 +54,8 @@ class SqlTest {
 
     @Test
     fun testQueryWithListParameter() {
-        val list = Sql(em, query(listOf(1, 2, 3, 4, 5)) {
-            +"select 1 from dual where 1 in :parameter"
-        })
-                .prepare()
+        val list = Sql<List<Long>>(em) { +"select 1 from dual where 1 in :parameter" }
+                .prepare(listOf(1, 2, 3, 4, 5))
                 .resultList as List<Long>
 
         assertThat(list, notNullValue())

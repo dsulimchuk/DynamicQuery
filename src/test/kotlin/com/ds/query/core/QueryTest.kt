@@ -37,7 +37,7 @@ class QueryTest {
         val query = query("param") {
             +"select 1 from dual where --m1\n--m2"
         }
-        assertThat(query.prepare(), equalTo("select 1 from dual where --m1\n--m2"))
+        assertThat(query.prepareText(), equalTo("select 1 from dual where --m1\n--m2"))
 
         query.run {
             m("m1") {
@@ -47,7 +47,7 @@ class QueryTest {
                 }
             }
         }
-        assertThat(query.prepare(), equalTo("select 1 from dual where (a=b) and (c=d)\n--m2"))
+        assertThat(query.prepareText(), equalTo("select 1 from dual where (a=b) and (c=d)\n--m2"))
 
         query.run {
             m("m2") {
@@ -56,7 +56,7 @@ class QueryTest {
                 }
             }
         }
-        assertThat(query.prepare(), equalTo("select 1 from dual where (a=b) and (c=d)\n and (x=y)"))
+        assertThat(query.prepareText(), equalTo("select 1 from dual where (a=b) and (c=d)\n and (x=y)"))
     }
 
     @Test
