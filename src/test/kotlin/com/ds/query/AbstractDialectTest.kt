@@ -14,7 +14,7 @@ import org.junit.runners.Parameterized.Parameters
  * *         created 27/10/16
  */
 @RunWith(Parameterized::class)
-class AbstractDialectQueryParametersTest(
+class AbstractDialectQueryDslParametersTest(
         val query: String,
         val expectedCount: Int,
         val expectedParams: List<String>) : AbstractDialect() {

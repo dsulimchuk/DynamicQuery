@@ -91,4 +91,20 @@ class HqlTest {
         assertThat(list, notNullValue())
         assertThat(list.size, equalTo(4))
     }
+
+    @Test
+    fun testQueryWithNestedParameter() {
+        data class C(val id: Long?)
+        data class B(val id: Long?, val c: C?)
+        data class A(val id: Long?, val b: B?)
+
+        val list = Hql<A>(em) {
+            +"select s from services s where s.id = :b_c_id"
+        }
+                .prepare(A(0, B(1, C(5))))
+                .resultList as List<Service>
+
+        assertThat(list, notNullValue())
+        assertThat(list.size, equalTo(1))
+    }
 }

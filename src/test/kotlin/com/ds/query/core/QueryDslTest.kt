@@ -9,10 +9,10 @@ import org.junit.Test
  * @author Dmitrii Sulimchuk
  * created 22/10/16
  */
-class QueryTest {
+class QueryDslTest {
     @Test
     fun m() {
-        val query = Query("param")
+        val query = QueryDsl("param")
         assertThat(query.macroses.size, equalTo(0))
 
         query.run { m("m1") { } }
@@ -22,7 +22,7 @@ class QueryTest {
 
     @Test
     operator fun unaryPlus() {
-        val query = Query("param")
+        val query = QueryDsl("param")
         assertThat(query.sourceQuery, equalTo(""))
 
         query.run { +"select" }
@@ -61,7 +61,7 @@ class QueryTest {
 
     @Test
     fun prepareMacroses_for_empty_macroses() {
-        val query = Query(TestParam("a", "b", null))
+        val query = QueryDsl(TestParam("a", "b", null))
         val result = query.prepareMacroses()
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(0))
@@ -69,7 +69,7 @@ class QueryTest {
 
     @Test
     fun prepareMacroses() {
-        val query = Query(TestParam("a", "b", null))
+        val query = QueryDsl(TestParam("a", "b", null))
         query.run {
             m("m1") {
                 test({ parameter.a != null }) {
@@ -97,7 +97,7 @@ class QueryTest {
 
     @Test
     fun keyToCommentRegex() {
-        val regex = Query("test").keyToCommentRegex("m1")
+        val regex = QueryDsl("test").keyToCommentRegex("m1")
 
 
         assertThat("select 1 from dual m1".replace(regex, ""), equalTo("select 1 from dual m1"))

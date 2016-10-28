@@ -1,7 +1,7 @@
 package com.ds.query
 
 
-import com.ds.query.core.Query
+import com.ds.query.core.QueryDsl
 import com.ds.query.core.query
 import java.util.*
 
@@ -14,12 +14,12 @@ import java.util.*
 fun main(args: Array<String>) {
     val query = UserRepository.getDyncmicQuery(SearchCriteria(null, "viktor", Date(), null))
     println(query.prepareText())
-    Query("")
+    QueryDsl("")
 }
 
 object UserRepository {
 
-    fun getDyncmicQuery(searchCriteria: SearchCriteria): Query<out Any> {
+    fun getDyncmicQuery(searchCriteria: SearchCriteria): QueryDsl<out Any> {
         return query(searchCriteria) {
             +"""
 select t.*
