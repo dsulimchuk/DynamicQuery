@@ -1,40 +1,42 @@
 package com.ds.query
 
-import com.ds.query.core.Query
+import com.ds.query.core.QueryDsl
 import mu.KLogging
 import org.apache.commons.beanutils.BeanUtils
 import javax.persistence.EntityManager
+import javax.persistence.Query
 
 /**
  * @author Dmitrii Sulimchuk
  * created 26/10/16
  */
 class Hql<T : Any>(val entityManager: EntityManager,
-                   val initQuery: Query<T>.() -> Unit)
-: AbstractDialect() {
+                   val initQueryDsl: QueryDsl<T>.() -> Unit) : AbstractDialect() {
     companion object : KLogging()
 
-    fun prepare(parameter: T): javax.persistence.Query {
-        val query = Query(parameter)
-        query.initQuery()
+    fun prepare(parameter: T): Query {
+        val dsl = QueryDsl(parameter)
+        dsl.initQueryDsl()
 
-        val queryText = query.prepareText()
+        return prepareResult(dsl)
+    }
+
+    private fun prepareResult(queryDsl: QueryDsl<T>): Query {
+
+        val queryText = queryDsl.prepareText()
         val result = entityManager.createQuery(queryText)
+        val allParameters = result.parameters?.map { it.name }?.toList() ?: emptyList()
 
-        val allParameters = findAllQueryParameters(queryText)
-
-        if (allParameters.isNotEmpty()) {
-            if (allParameters.size == 1 && isBaseType(query.parameter)) {
-                Sql.logger.debug { "set parameter ${allParameters[0]} to ${query.parameter}" }
-                result.setParameter(allParameters[0], query.parameter)
-            } else {
-                allParameters
-                        .map { it to BeanUtils.getProperty(query.parameter, it) }
-                        .forEach {
-                            Sql.logger.debug { "set parameter ${it.first} to ${it.second}" }
-                            result.setParameter(it.first, it.second)
-                        }
-            }
+        if (allParameters.size == 1 && isBaseType(queryDsl.parameter)) {
+            logger.debug { "set parameter ${allParameters.first()} to ${queryDsl.parameter}" }
+            result.setParameter(allParameters.first(), queryDsl.parameter)
+        } else {
+            allParameters
+                    .map { it to BeanUtils.getProperty(queryDsl.parameter, it.replace("_", ".")) }
+                    .forEach {
+                        logger.debug { "set parameter ${it.first} to ${it.second}" }
+                        result.setParameter(it.first, it.second)
+                    }
         }
 
         return result

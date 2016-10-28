@@ -1,17 +1,24 @@
 package com.ds.query
 
+import mu.KLogging
+
 /**
  * @author Dmitrii Sulimchuk
  * created 26/10/16
  */
 
 abstract class AbstractDialect {
+    companion object : KLogging()
+
     internal fun findAllQueryParameters(queryText: String): List<String> {
-        return Regex(":([a-zA-Z0-9_.]+)").findAll(queryText)
+        val params = Regex(":([a-zA-Z0-9_.]+)").findAll(queryText)
                 .map { it.groups[1]?.value }
                 .filterNotNull()
                 .distinct()
                 .toList()
+
+        logger.debug { "extracted params = $params" }
+        return params
     }
 
     internal fun isBaseType(parameter: Any): Boolean {

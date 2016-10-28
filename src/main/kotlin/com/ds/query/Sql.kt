@@ -1,8 +1,9 @@
 package com.ds.query
 
-import com.ds.query.core.Query
+import com.ds.query.core.QueryDsl
 import mu.KLogging
 import org.apache.commons.beanutils.BeanUtils
+import org.apache.commons.beanutils.PropertyUtils
 import javax.persistence.EntityManager
 
 /**
@@ -10,13 +11,13 @@ import javax.persistence.EntityManager
  * created 23/10/16
  */
 class Sql<T : Any>(val entityManager: EntityManager,
-                   val initQuery: Query<T>.() -> Unit)
+                   val initQueryDsl: QueryDsl<T>.() -> Unit)
 : AbstractDialect() {
     companion object : KLogging()
 
     fun prepare(parameter: T): javax.persistence.Query {
-        val query = Query(parameter)
-        query.initQuery()
+        val query = QueryDsl(parameter)
+        query.initQueryDsl()
 
         val queryText = query.prepareText()
         val result = entityManager.createNativeQuery(queryText)
@@ -29,7 +30,7 @@ class Sql<T : Any>(val entityManager: EntityManager,
                 result.setParameter(allParameters[0], query.parameter)
             } else {
                 allParameters
-                        .map { it to BeanUtils.getProperty(query.parameter, it) }
+                        .map { it to PropertyUtils.getProperty(query.parameter, it) }
                         .forEach {
                             logger.debug { "set parameter ${it.first} to ${it.second}" }
                             result.setParameter(it.first, it.second)

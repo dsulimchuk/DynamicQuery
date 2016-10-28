@@ -8,7 +8,7 @@ import kotlin.text.RegexOption.IGNORE_CASE
 * @author Dmitrii Sulimchuk
 * created 19/10/16
 */
-class Query<T : Any> {
+class QueryDsl<T : Any> {
     companion object : KLogging()
 
     val parameter: T
@@ -51,6 +51,8 @@ class Query<T : Any> {
                 .replace(Regex("where +and", IGNORE_CASE), "where")
                 .replace(Regex("and +and", IGNORE_CASE), "and")
 
+        logger.debug { "prepareText = $replace" }
+
         return replace
     }
 
@@ -86,12 +88,12 @@ class Query<T : Any> {
     internal fun keyToCommentRegex(key: String?) = "(-- *$key[^\n]*)|(/\\* *$key *\\*/)".toRegex()
 
     override fun toString(): String {
-        return "Query(parameter=$parameter, sourceQuery='$sourceQuery', macroses=$macroses)"
+        return "QueryDsl(parameter=$parameter, sourceQuery='$sourceQuery', macroses=$macroses)"
     }
 }
 
-fun <T : Any> query(param: T, init: Query<T>.() -> Unit): Query<T> {
-    val root = Query(param)
+fun <T : Any> query(param: T, init: QueryDsl<T>.() -> Unit): QueryDsl<T> {
+    val root = QueryDsl(param)
     root.init()
     return root
 }
