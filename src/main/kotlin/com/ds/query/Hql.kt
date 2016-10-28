@@ -3,6 +3,7 @@ package com.ds.query
 import com.ds.query.core.QueryDsl
 import mu.KLogging
 import org.apache.commons.beanutils.BeanUtils
+import org.apache.commons.beanutils.PropertyUtils
 import javax.persistence.EntityManager
 import javax.persistence.Query
 
@@ -32,7 +33,7 @@ class Hql<T : Any>(val entityManager: EntityManager,
             result.setParameter(allParameters.first(), queryDsl.parameter)
         } else {
             allParameters
-                    .map { it to BeanUtils.getProperty(queryDsl.parameter, it.replace("_", ".")) }
+                    .map { it to PropertyUtils.getProperty(queryDsl.parameter, it.replace("_", ".")) }
                     .forEach {
                         logger.debug { "set parameter ${it.first} to ${it.second}" }
                         result.setParameter(it.first, it.second)

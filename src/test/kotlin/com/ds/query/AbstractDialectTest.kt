@@ -1,6 +1,5 @@
 package com.ds.query
 
-import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.*
 import org.junit.Test
 
@@ -43,7 +42,7 @@ class AbstractDialectQueryDslParametersTest(
         assertThat("size equals", result.size, equalTo(expectedCount))
         assertThat("check that result is unique",
                 result.distinct().size, equalTo(result.size))
-        assertTrue("chech expected params ${expectedParams} in ${result}",
+        assertTrue("chech expected params $expectedParams in $result",
                 result.containsAll(expectedParams))
     }
 

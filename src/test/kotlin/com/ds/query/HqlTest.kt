@@ -1,6 +1,5 @@
 package com.ds.query
 
-import com.ds.query.core.query
 import com.ds.query.testmodel.Service
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
