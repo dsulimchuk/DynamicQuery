@@ -1,4 +1,4 @@
-group 'com.ds.query'
+group 'com.github.dsulimchuk.dynamicquery'
 version '1.0-SNAPSHOT'
 
 buildscript {
