@@ -1,4 +1,4 @@
-package com.ds.query.core
+package com.github.dsulimchuk.dynamicquery.core
 
 import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.*
@@ -89,7 +89,7 @@ class QueryDslTest {
         val result = query.prepareMacroses()
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(2))
-        assertThat(result["m1"], CoreMatchers.allOf(containsString("x = :a"), containsString("y = :b")))
+        assertThat(result["m1"], allOf(containsString("x = :a"), containsString("y = :b")))
         assertThat(result["m2"], containsString("1=1"))
 
 

@@ -1,6 +1,6 @@
-package com.ds.query
+package com.github.dsulimchuk.dynamicquery
 
-import com.ds.query.testmodel.Service
+import com.github.dsulimchuk.dynamicquery.testmodel.Service
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.After

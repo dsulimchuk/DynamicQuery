@@ -1,4 +1,4 @@
-package com.ds.query.core
+package com.github.dsulimchuk.dynamicquery.core
 
 import java.util.*
 

@@ -1,4 +1,4 @@
-package com.ds.query.core
+package com.github.dsulimchuk.dynamicquery.core
 
 class Test<in T>(val condition: (T) -> Boolean) {
     //lateinit var condition: (T) -> Boolean //= { true }

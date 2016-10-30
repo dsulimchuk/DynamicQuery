@@ -1,10 +1,10 @@
-package com.ds.query
+package com.github.dsulimchuk.dynamicquery
 
-import com.ds.query.core.QueryDsl
+import com.github.dsulimchuk.dynamicquery.core.QueryDsl
 import mu.KLogging
-import org.apache.commons.beanutils.BeanUtils
 import org.apache.commons.beanutils.PropertyUtils
 import javax.persistence.EntityManager
+import javax.persistence.Query
 
 /**
  * @author Dmitrii Sulimchuk
@@ -15,7 +15,7 @@ class Sql<T : Any>(val entityManager: EntityManager,
 : AbstractDialect() {
     companion object : KLogging()
 
-    fun prepare(parameter: T): javax.persistence.Query {
+    fun prepare(parameter: T): Query {
         val query = QueryDsl(parameter)
         query.initQueryDsl()
 
@@ -40,7 +40,6 @@ class Sql<T : Any>(val entityManager: EntityManager,
 
         return result
     }
-
 
 
 }

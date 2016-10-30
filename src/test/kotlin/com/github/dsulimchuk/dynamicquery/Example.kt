@@ -1,8 +1,8 @@
-package com.ds.query
+package com.github.dsulimchuk.dynamicquery
 
 
-import com.ds.query.core.QueryDsl
-import com.ds.query.core.query
+import com.github.dsulimchuk.dynamicquery.core.QueryDsl
+import com.github.dsulimchuk.dynamicquery.core.query
 import java.util.*
 
 /**

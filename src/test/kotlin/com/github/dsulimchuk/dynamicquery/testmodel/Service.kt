@@ -1,4 +1,4 @@
-package com.ds.query.testmodel
+package com.github.dsulimchuk.dynamicquery.testmodel
 
 import java.util.*
 import javax.persistence.Entity

@@ -1,4 +1,4 @@
-package com.ds.query
+package com.github.dsulimchuk.dynamicquery
 
 import org.hamcrest.CoreMatchers.*
 import org.junit.Test
