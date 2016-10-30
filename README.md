@@ -1,2 +1,2 @@
 # DynamicQuery
-prototyping queryDsl for Hibernate on kotlin
+Dynamic Query DSL for JPA (Hibernate) on Kotlin (prototyping)
