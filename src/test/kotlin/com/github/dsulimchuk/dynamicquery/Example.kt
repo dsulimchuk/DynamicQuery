@@ -29,10 +29,13 @@ select t.*
           from user_services t
                  left join services s on (t.service_id = s.service_id)
                  left join branch b on (t.branch_id = b.branch_id)
-         where --m
+         where 1 = 1
+           and &m1
+           --&m2
          order by b.name
         )t left join departments d on (t.department_id = d.department_id)
-  where --m2
+  where 1=1
+  --&m2
 
 """
 
@@ -54,16 +57,9 @@ select t.*
                 }
             }
 
-            m("m1") {
-
-            }
-
-
         }
     }
 }
 
-data class SearchCriteria(val id: Long?, val name: String?, val activationDate: Date?, val  departmentId: Long?) {
-
-}
+data class SearchCriteria(val id: Long?, val name: String?, val activationDate: Date?, val  departmentId: Long?)
 

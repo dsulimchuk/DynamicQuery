@@ -21,12 +21,12 @@ class HqlTest {
 
     @Before
     fun setUp() {
-        em.getTransaction().begin()
+        em.transaction.begin()
     }
 
     @After
     fun tearDown() {
-        em.getTransaction().commit()
+        em.transaction.commit()
         em.close()
     }
 
@@ -57,7 +57,7 @@ class HqlTest {
             select distinct t
               from services t join t.users u
              where upper(u.name) like upper(:name||'%')
-               and --macros
+               and &macros
 """
             m("macros") {
                 test({ parameter.salary != null }) {
@@ -65,6 +65,8 @@ class HqlTest {
                 }
             }
         }
+
+
         val result = findUserServices.prepare(SearchCriteria("us", 20))
                 .resultList as List<Service>
 

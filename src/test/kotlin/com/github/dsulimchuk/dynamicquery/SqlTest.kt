@@ -20,12 +20,12 @@ class SqlTest {
 
     @Before
     fun setUp() {
-        em.getTransaction().begin()
+        em.transaction.begin()
     }
 
     @After
     fun tearDown() {
-        em.getTransaction().commit()
+        em.transaction.commit()
         em.close()
     }
 

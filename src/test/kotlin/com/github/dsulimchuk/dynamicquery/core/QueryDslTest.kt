@@ -1,6 +1,5 @@
 package com.github.dsulimchuk.dynamicquery.core
 
-import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -35,9 +34,9 @@ class QueryDslTest {
     @Test
     fun prepare() {
         val query = query("param") {
-            +"select 1 from dual where --m1\n--m2"
+            +"select 1 from dual where 1=1 --&m1\n--&m2"
         }
-        assertThat(query.prepareText(), equalTo("select 1 from dual where --m1\n--m2"))
+        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 --&m1\n--&m2"))
 
         query.run {
             m("m1") {
@@ -47,7 +46,7 @@ class QueryDslTest {
                 }
             }
         }
-        assertThat(query.prepareText(), equalTo("select 1 from dual where (a=b) and (c=d)\n--m2"))
+        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 and (a=b) and (c=d)\n--&m2"))
 
         query.run {
             m("m2") {
@@ -56,7 +55,7 @@ class QueryDslTest {
                 }
             }
         }
-        assertThat(query.prepareText(), equalTo("select 1 from dual where (a=b) and (c=d)\n and (x=y)"))
+        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 and (a=b) and (c=d)\nand (x=y)"))
     }
 
     @Test
@@ -102,11 +101,15 @@ class QueryDslTest {
 
         assertThat("select 1 from dual m1".replace(regex, ""), equalTo("select 1 from dual m1"))
 
-        assertThat("select 1 from dual --m1".replace(regex, ""), equalTo("select 1 from dual "))
-        assertThat("select 1 from dual --m1 and 5=6".replace(regex, ""), equalTo("select 1 from dual "))
-        assertThat("select 1 from dual --m1 \nand 5=6".replace(regex, ""), equalTo("select 1 from dual \nand 5=6"))
+        assertThat("select 1 from dual --&m1".replace(regex, ""), equalTo("select 1 from dual "))
+        assertThat("select 1 from dual --&m1 \n and 5=6".replace(regex, ""),
+                equalTo("select 1 from dual \n and 5=6"))
+        assertThat("select 1 from dual --&m1 \nand 5=6".replace(regex, ""),
+                equalTo("select 1 from dual \nand 5=6"))
+        assertThat("select 1 from dual where &m1 and 2=2".replace(regex, "1=2"),
+                equalTo("select 1 from dual where 1=2 and 2=2"))
 
-        assertThat("select 1 from dual /* m1 */ and 5=6".replace(regex, ""), equalTo("select 1 from dual  and 5=6"))
+        assertThat("select 1 from dual /* &m1 */ and 5=6".replace(regex, ""), equalTo("select 1 from dual  and 5=6"))
     }
 
 }

@@ -63,6 +63,7 @@ class QueryDsl<T : Any> {
                             .filter { checkContition(it) }
                             .map { it.macrosText }
                             .joinToString(" ")
+                            .trim()
                             .let { if (it.isBlank()) "(1=1)" else it }
 
                     it.key to macrosText
@@ -80,12 +81,13 @@ class QueryDsl<T : Any> {
      * for example:
      * select 1
      *   from dual
-     *  where --m1
-     *    and /*m2*/
+     *  where 1 = 1
+     *    --&m1
+     *    /*&m2 */
      *
-     * where --m1 and  /*m2*/ is a valid placeholders
+     * where --&m1 and  /*&m2*/ is a valid placeholders
      */
-    internal fun keyToCommentRegex(key: String?) = "(-- *$key[^\n]*)|(/\\* *$key *\\*/)".toRegex()
+    internal fun keyToCommentRegex(key: String?) = "(-- *&$key[^\n]*)|(/\\* *&$key *\\*/)|(&$key)".toRegex()
 
     override fun toString(): String {
         return "QueryDsl(parameter=$parameter, sourceQuery='$sourceQuery', macroses=$macroses)"

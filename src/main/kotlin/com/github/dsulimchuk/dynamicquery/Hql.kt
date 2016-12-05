@@ -25,7 +25,7 @@ class Hql<T : Any>(val entityManager: EntityManager,
 
         val queryText = queryDsl.prepareText()
         val result = entityManager.createQuery(queryText)
-        val allParameters = result.parameters?.map { it.name }?.toList() ?: emptyList()
+        val allParameters = result.parameters?.map { it.name } ?: emptyList()
 
         if (allParameters.size == 1 && isBaseType(queryDsl.parameter)) {
             logger.debug { "set parameter ${allParameters.first()} to ${queryDsl.parameter}" }

@@ -8,5 +8,4 @@ class Test<in T>(val condition: (T) -> Boolean) {
         macrosText += " and (${this.trim()})"
     }
 
-
 }
