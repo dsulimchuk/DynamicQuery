@@ -6,7 +6,7 @@ class Macros<T>(val name: String) {
     val testers = ArrayList<Test<T>>()
 
     fun test(condition: (T) -> Boolean, tester: Test<T>.() -> Unit): Test<T> {
-        val test = Test(condition)
+        val test = Test(condition, "${name}_${testers.size}")
         test.tester()
         testers += test
         return test

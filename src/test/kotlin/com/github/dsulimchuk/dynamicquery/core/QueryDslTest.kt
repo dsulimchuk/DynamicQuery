@@ -34,7 +34,7 @@ class QueryDslTest {
     @Test
     fun prepare() {
         val query = query("param") {
-            +"select 1 from dual where 1=1 --&m1\n--&m2"
+            +"select 1 from dual where 1=1 --and &m1\n--&m2"
         }
         assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 --&m1\n--&m2"))
 
@@ -112,6 +112,38 @@ class QueryDslTest {
         assertThat("select 1 from dual /* &m1 */ and 5=6".replace(regex, ""), equalTo("select 1 from dual  and 5=6"))
     }
 
+    @Test
+    fun testNestedQueries() {
+        val query1 = QueryDsl("testParam1").apply {
+            +"select 1 from dual where &m1"
+            m("m1") {
+                test({ parameter.isNotEmpty() }) {
+                    +"'testParam1' = :parameter"
+                }
+            }
+        }
+
+        val query2 = QueryDsl("testParam2").apply {
+            +"select 2 from dual where &m1 and &m2"
+            m("m1") {
+                test({ parameter.isNotEmpty() }) {
+                    +"'testParam2' = :parameter"
+                }
+            }
+
+            m("m2") {
+                test({ parameter.isNotEmpty() }) {
+                    +" 1 in ("
+                    +query1
+                    +")"
+                }
+            }
+        }
+        val result = query2.prepareText()
+
+        assertThat(result,
+                equalTo("select 2 from dual where 'testParam2' = :parameter and 1 in (select 1 from dual where 'testParam1' = :m2_0#parameter)"))
+    }
 }
 
 data class TestParam(val a: String?, val b: String?, val c: String?)

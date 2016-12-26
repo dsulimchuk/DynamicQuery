@@ -108,4 +108,32 @@ class HqlTest {
         assertThat(list, notNullValue())
         assertThat(list.size, equalTo(1))
     }
+
+    @Test
+    fun testQueryWithSubquery() {
+        val userQuery = Hql<String>(em) {
+            +"select s from users s where &m1"
+            m("m1") {
+                test({ parameter != null }) {
+                    +"upper(s.name) like :parameter"
+                }
+            }
+        }
+
+
+        val services = Hql<String>(em) {
+            +"select s from services s where &macros1"
+            m("macros1") {
+                test({ parameter != null }) {
+                    +"s.id in ("
+                    +userQuery.prepare("dima")
+                    +")"
+                }
+            }
+        }
+
+
+        assertThat(list, notNullValue())
+        assertThat(list.size, equalTo(1))
+    }
 }
