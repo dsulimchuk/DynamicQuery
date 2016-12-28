@@ -1,6 +1,8 @@
 package com.github.dsulimchuk.dynamicquery
 
+import com.github.dsulimchuk.dynamicquery.core.QueryData
 import mu.KLogging
+import javax.persistence.Query
 
 /**
  * @author Dmitrii Sulimchuk
@@ -36,5 +38,12 @@ abstract class AbstractDialect {
         //todo extension
             else -> false
         }
+    }
+
+    internal fun <T : Query> T.setHintInJpaQuery(queryData: QueryData): T {
+        if (queryData.hints.isNotEmpty()) {
+            this.setHint("org.hibernate.tratata", queryData.hintsAsString())
+        }
+        return this
     }
 }

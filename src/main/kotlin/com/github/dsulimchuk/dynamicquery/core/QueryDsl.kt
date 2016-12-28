@@ -5,9 +5,9 @@ import java.util.*
 import kotlin.text.RegexOption.IGNORE_CASE
 
 /**
-* @author Dmitrii Sulimchuk
-* created 19/10/16
-*/
+ * @author Dmitrii Sulimchuk
+ * created 19/10/16
+ */
 class QueryDsl<T : Any> {
     companion object : KLogging()
 
@@ -37,36 +37,38 @@ class QueryDsl<T : Any> {
     }
 
 
-    fun prepareText(): String {
-        var result = sourceQuery
-        val preparedMacroses = prepareMacroses()
+    fun prepareText(): QueryData {
+        var queryText = sourceQuery
+        val macroses = prepareMacroses()
 
         //replace placeholder to macros value
-        preparedMacroses.forEach {
-            result = result.replace(keyToCommentRegex(it.key), it.value)
+        macroses.forEach {
+            queryText = queryText.replace(keyToCommentRegex(it.key), it.value.macrosText)
         }
 
         //cleanup possible duplicates
-        val replace = result
+        val queryTextAfterCleanup = queryText
                 .replace(Regex("where +and", IGNORE_CASE), "where")
                 .replace(Regex("and +and", IGNORE_CASE), "and")
 
-        logger.debug { "prepareText = $replace" }
+        logger.debug { "preparedQueryText = $queryTextAfterCleanup" }
 
-        return replace
+        return QueryData(queryTextAfterCleanup, macroses.flatMap { it.value.macrosHints })
     }
 
-    internal fun prepareMacroses(): Map<String, String> {
+    internal fun prepareMacroses(): Map<String, PassedMacrosData> {
         return macroses
-                .map {
-                    val macrosText = it.value.testers.asSequence()
-                            .filter { checkContition(it) }
+                .map { macros ->
+                    val passedTests = macros.value.testers.filter { checkContition(it) }
+
+                    val macrosHints = passedTests.flatMap { it.queryHints }
+                    val macrosText = passedTests
                             .map { it.macrosText }
                             .joinToString(" ")
                             .trim()
                             .let { if (it.isBlank()) "(1=1)" else it }
 
-                    it.key to macrosText
+                    macros.key to PassedMacrosData(macrosText, macrosHints)
                 }.toMap()
     }
 
@@ -93,6 +95,7 @@ class QueryDsl<T : Any> {
         return "QueryDsl(parameter=$parameter, sourceQuery='$sourceQuery', macroses=$macroses)"
     }
 }
+
 
 fun <T : Any> query(param: T, init: QueryDsl<T>.() -> Unit): QueryDsl<T> {
     val root = QueryDsl(param)

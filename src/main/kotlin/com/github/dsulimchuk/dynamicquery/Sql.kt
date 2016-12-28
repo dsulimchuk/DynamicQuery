@@ -12,33 +12,35 @@ import javax.persistence.Query
  */
 class Sql<T : Any>(val entityManager: EntityManager,
                    val initQueryDsl: QueryDsl<T>.() -> Unit)
-: AbstractDialect() {
+    : AbstractDialect() {
     companion object : KLogging()
 
     fun prepare(parameter: T): Query {
         val query = QueryDsl(parameter)
         query.initQueryDsl()
 
-        val queryText = query.prepareText()
-        val result = entityManager.createNativeQuery(queryText)
+        val queryData = query.prepareText()
+        val jpaNativeQuery = entityManager
+                .createNativeQuery(queryData.queryText)
+                .setHintInJpaQuery(queryData)
 
-        val allParameters = findAllQueryParameters(queryText)
+        val allParameters = findAllQueryParameters(queryData.queryText)
 
         if (allParameters.isNotEmpty()) {
             if (allParameters.size == 1 && isBaseType(query.parameter)) {
                 logger.debug { "set parameter ${allParameters[0]} to ${query.parameter}" }
-                result.setParameter(allParameters[0], query.parameter)
+                jpaNativeQuery.setParameter(allParameters[0], query.parameter)
             } else {
                 allParameters
                         .map { it to PropertyUtils.getProperty(query.parameter, it) }
                         .forEach {
                             logger.debug { "set parameter ${it.first} to ${it.second}" }
-                            result.setParameter(it.first, it.second)
+                            jpaNativeQuery.setParameter(it.first, it.second)
                         }
             }
         }
 
-        return result
+        return jpaNativeQuery
     }
 
 

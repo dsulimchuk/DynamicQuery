@@ -36,7 +36,7 @@ class QueryDslTest {
         val query = query("param") {
             +"select 1 from dual where 1=1 --&m1\n--&m2"
         }
-        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 --&m1\n--&m2"))
+        assertThat(query.prepareText().queryText, equalTo("select 1 from dual where 1=1 --&m1\n--&m2"))
 
         query.run {
             m("m1") {
@@ -46,7 +46,7 @@ class QueryDslTest {
                 }
             }
         }
-        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 and (a=b) and (c=d)\n--&m2"))
+        assertThat(query.prepareText().queryText, equalTo("select 1 from dual where 1=1 and (a=b) and (c=d)\n--&m2"))
 
         query.run {
             m("m2") {
@@ -55,7 +55,7 @@ class QueryDslTest {
                 }
             }
         }
-        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 and (a=b) and (c=d)\nand (x=y)"))
+        assertThat(query.prepareText().queryText, equalTo("select 1 from dual where 1=1 and (a=b) and (c=d)\nand (x=y)"))
     }
 
     @Test
@@ -88,10 +88,8 @@ class QueryDslTest {
         val result = query.prepareMacroses()
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(2))
-        assertThat(result["m1"], allOf(containsString("x = :a"), containsString("y = :b")))
-        assertThat(result["m2"], containsString("1=1"))
-
-
+        assertThat(result["m1"]?.macrosText, allOf(containsString("x = :a"), containsString("y = :b")))
+        assertThat(result["m2"]?.macrosText, containsString("1=1"))
     }
 
     @Test

@@ -62,6 +62,9 @@ class HqlTest {
             m("macros") {
                 test({ parameter.salary != null }) {
                     +"salary > :salary"
+                    addQueryHint("cardinality(t 1)")
+                    addQueryHint("cardinality(u 10000)")
+                    addQueryHint("use_nl(t, u)")
                 }
             }
         }
