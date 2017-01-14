@@ -32,7 +32,7 @@ class HqlTest {
 
     @Test
     fun testQueryWithOneParameter() {
-        val findUserServices = Hql<String>(em) {
+        val findUserServices = Hql<String>({ em }) {
             +"""
             select distinct t
               from services t join t.users u
@@ -52,7 +52,7 @@ class HqlTest {
     fun testQueryWithSeveralParameter() {
         data class SearchCriteria(val name: String?, val salary: Long?)
 
-        val findUserServices = Hql<SearchCriteria>(em) {
+        val findUserServices = Hql<SearchCriteria>({ em }) {
             +"""
             select distinct t
               from services t join t.users u
@@ -83,7 +83,7 @@ class HqlTest {
 
     @Test
     fun testQueryWithListParameter() {
-        val list = Hql<List<Long>>(em) {
+        val list = Hql<List<Long>>({ em }) {
             +"select s from services s where s.id in :parameter"
         }
                 .prepare(listOf(1, 2, 3, 5))
@@ -99,7 +99,7 @@ class HqlTest {
         data class B(val id: Long?, val c: C?)
         data class A(val id: Long?, val b: B?)
 
-        val list = Hql<A>(em) {
+        val list = Hql<A>({ em }) {
             +"select s from services s where s.id = :b_c_id"
         }
                 .prepare(A(0, B(1, C(5))))

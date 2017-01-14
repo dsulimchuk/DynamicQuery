@@ -10,7 +10,7 @@ import javax.persistence.Query
  * @author Dmitrii Sulimchuk
  * created 26/10/16
  */
-class Hql<T : Any>(val entityManager: EntityManager,
+class Hql<T : Any>(val entityManager: () -> EntityManager,
                    val initQueryDsl: QueryDsl<T>.() -> Unit) : AbstractDialect() {
     companion object : KLogging()
 
@@ -24,7 +24,7 @@ class Hql<T : Any>(val entityManager: EntityManager,
     private fun prepareResult(queryDsl: QueryDsl<T>): Query {
 
         val queryText = queryDsl.prepareText()
-        val result = entityManager.createQuery(queryText)
+        val result = entityManager.invoke().createQuery(queryText)
         val allParameters = result.parameters?.map { it.name } ?: emptyList()
 
         if (allParameters.size == 1 && isBaseType(queryDsl.parameter)) {

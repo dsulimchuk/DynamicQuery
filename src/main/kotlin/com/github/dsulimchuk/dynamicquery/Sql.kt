@@ -10,7 +10,7 @@ import javax.persistence.Query
  * @author Dmitrii Sulimchuk
  * created 23/10/16
  */
-class Sql<T : Any>(val entityManager: EntityManager,
+class Sql<T : Any>(val entityManager: () -> EntityManager,
                    val initQueryDsl: QueryDsl<T>.() -> Unit)
 : AbstractDialect() {
     companion object : KLogging()
@@ -20,7 +20,7 @@ class Sql<T : Any>(val entityManager: EntityManager,
         query.initQueryDsl()
 
         val queryText = query.prepareText()
-        val result = entityManager.createNativeQuery(queryText)
+        val result = entityManager.invoke().createNativeQuery(queryText)
 
         val allParameters = findAllQueryParameters(queryText)
 

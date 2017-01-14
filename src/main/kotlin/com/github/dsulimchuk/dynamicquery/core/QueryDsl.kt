@@ -5,11 +5,14 @@ import java.util.*
 import kotlin.text.RegexOption.IGNORE_CASE
 
 /**
-* @author Dmitrii Sulimchuk
-* created 19/10/16
-*/
+ * @author Dmitrii Sulimchuk
+ * created 19/10/16
+ */
 class QueryDsl<T : Any> {
-    companion object : KLogging()
+    companion object : KLogging() {
+        private val whereThenAndReplaceRegex = Regex("where +and", IGNORE_CASE)
+        private val doubleAndregex = Regex("and +and", IGNORE_CASE)
+    }
 
     val parameter: T
     var sourceQuery: String = ""
@@ -48,8 +51,8 @@ class QueryDsl<T : Any> {
 
         //cleanup possible duplicates
         val replace = result
-                .replace(Regex("where +and", IGNORE_CASE), "where")
-                .replace(Regex("and +and", IGNORE_CASE), "and")
+                .replace(whereThenAndReplaceRegex, "where")
+                .replace(doubleAndregex, "and")
 
         logger.debug { "prepareText = $replace" }
 
