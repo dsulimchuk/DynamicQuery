@@ -13,4 +13,5 @@ insert into users(id, name, salary) values (5, 'user5', 50);
 insert into users_services(users_id, services_id) values (1, 1);
 insert into users_services(users_id, services_id) values (2, 2);
 insert into users_services(users_id, services_id) values (3, 3);
+insert into users_services(users_id, services_id) values (3, 2);
 insert into users_services(users_id, services_id) values (4, 4);
