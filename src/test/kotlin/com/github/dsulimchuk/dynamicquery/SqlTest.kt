@@ -63,14 +63,15 @@ class SqlTest {
 
     @Test
     fun testExampleQuery() {
-        val result = query.prepare(em, SearchCriteria(null, "viktor", 10.0, null))
+        val result = query
+                .prepare(em, SearchCriteria(null, "viktor", 10.0, "service_name"))
                 .resultList
     }
 
     private val query = Sql<SearchCriteria> {
         +"""
 select t.*
-  from (select t.*
+  from (select u.*
               ,s.name service_name
               ,b.name branch_name
           from users u
@@ -78,12 +79,12 @@ select t.*
                  left join services s on (t.services_id = s.id)
                  left join branches b on (s.branch_id = b.id)
          where &m1
-         order by b.name
         )t
   order by &orderMacros
 
 """
 
+        //now we can declare macros m1. At runtime it will be computed on given search Criteria
         m("m1") {
             test({ parameter.id != null }) {
                 +"t.id = :id"
@@ -96,14 +97,21 @@ select t.*
             }
         }
 
+        //order by macros
         m("orderMacros") {
-            test({ true }) {
-                +"1, 2, 3"
+            test({ parameter.sort.isBlank() }) {
+                +"name" //default sort order
+            }
+            test({ parameter.sort.isNotBlank() }) {
+                +parameter.sort
             }
         }
     }
 
-    data class SearchCriteria(val id: Long?, val name: String?, val salary: Double?, val departmentId: Long?)
+    data class SearchCriteria(val id: Long?,
+                              val name: String?,
+                              val salary: Double?,
+                              val sort: String = "")
 
 }
 
