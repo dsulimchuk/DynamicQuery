@@ -20,7 +20,6 @@ select t.*
                  left join services s on (t.services_id = s.id)
                  left join branches b on (s.branch_id = b.id)
          where &m1
-         order by b.name
         )t
   order by &orderMacros
 
@@ -42,7 +41,7 @@ select t.*
         //order by macros
         m("orderMacros") {
             test({ parameter.sort.isBlank() }) {
-                +"1, 2, 3" //default sort order
+                +"name" //default sort order
             }
             test({ parameter.sort.isNotBlank() }) {
                 +parameter.sort
