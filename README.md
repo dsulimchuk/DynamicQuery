@@ -66,4 +66,14 @@ now we simply call prepare method and pass entityManager with actual parameters
                 .prepare(em, SearchCriteria(null, "viktor", 10.0, "branch_name, service_name"))
                 .resultList
     }
-```      
+```    
+
+## Download
+
+```xml
+<dependency>
+    <groupId>com.github.dsulimchuk.dynamicquery</groupId>
+    <artifactId>dynamic-query</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
