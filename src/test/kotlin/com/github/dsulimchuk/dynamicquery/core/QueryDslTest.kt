@@ -9,6 +9,13 @@ import org.junit.Test
  * created 22/10/16
  */
 class QueryDslTest {
+
+    fun <T : Any> query(param: T, init: QueryDsl<T>.() -> Unit): QueryDsl<T> {
+        val root = QueryDsl(param)
+        root.init()
+        return root
+    }
+
     @Test
     fun m() {
         val query = QueryDsl("param")
@@ -31,14 +38,21 @@ class QueryDslTest {
         assertThat(query.sourceQuery, equalTo("select from"))
     }
 
+
+    @Test
+    fun prepareWithEmptyMacrosesMustBeTheSame() {
+        val queryText = "select 1 from dual where 1=1 and &m1\nor &m2"
+        val query = query("param") {
+            +queryText
+        }
+        assertThat(query.prepareText(), equalTo(queryText))
+    }
+
     @Test
     fun prepare() {
         val query = query("param") {
-            +"select 1 from dual where 1=1 --&m1\n--&m2"
-        }
-        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 --&m1\n--&m2"))
+            +"select 1 from dual where 1=1 and &m1\nor &m2"
 
-        query.run {
             m("m1") {
                 test({ true }) {
                     +"a=b"
@@ -46,16 +60,49 @@ class QueryDslTest {
                 }
             }
         }
-        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 and (a=b) and (c=d)\n--&m2"))
+
+        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 and (a=b and c=d)\nor &m2"))
 
         query.run {
             m("m2") {
                 test({ true }) {
                     +"x=y"
+                    +"1=2"
                 }
             }
         }
-        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 and (a=b) and (c=d)\nand (x=y)"))
+        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 and (a=b and c=d)\nor (x=y and 1=2)"))
+    }
+
+    @Test(expected = QueryParsingException::class)
+    fun prepareTextForCountAllNegative() {
+        val query = query("param") {
+            +"select 1"
+        }
+
+        query.prepareText(true)
+    }
+
+    @Test()
+    fun prepareTextForCountAllPositiveWithDefaultProjection() {
+        val query = query("param") {
+            +"select 1 from dual"
+        }
+
+        val result = query.prepareText(true)
+        assertThat(result, equalTo("select count(*) from dual"))
+    }
+
+
+    @Test()
+    fun prepareTextForCountAllPositive() {
+        val query = query("param") {
+            +"select 1 from services s join projects p on s.project_id = p.project_id"
+            countAllProjection = "count(distict s)"
+        }
+
+        val result = query.prepareText(true)
+        assertThat(result, equalTo("select count(distict s) from services s join projects p on s.project_id = p.project_id"))
     }
 
     @Test
@@ -99,19 +146,33 @@ class QueryDslTest {
         val regex = QueryDsl("test").keyToCommentRegex("m1")
 
 
-        assertThat("select 1 from dual m1".replace(regex, ""), equalTo("select 1 from dual m1"))
+        assertThat("select 1 from dual where &m1".replace(regex, ""), equalTo("select 1 from dual where "))
 
-        assertThat("select 1 from dual --&m1".replace(regex, ""), equalTo("select 1 from dual "))
-        assertThat("select 1 from dual --&m1 \n and 5=6".replace(regex, ""),
-                equalTo("select 1 from dual \n and 5=6"))
-        assertThat("select 1 from dual --&m1 \nand 5=6".replace(regex, ""),
-                equalTo("select 1 from dual \nand 5=6"))
+        assertThat("select 1 from dual &m1".replace(regex, ""), equalTo("select 1 from dual "))
+        assertThat("select 1 from dual &m1 \n and 5=6".replace(regex, ""),
+                equalTo("select 1 from dual  \n and 5=6"))
+        assertThat("select 1 from dual &m1 \nand 5=6".replace(regex, ""),
+                equalTo("select 1 from dual  \nand 5=6"))
         assertThat("select 1 from dual where &m1 and 2=2".replace(regex, "1=2"),
                 equalTo("select 1 from dual where 1=2 and 2=2"))
 
-        assertThat("select 1 from dual /* &m1 */ and 5=6".replace(regex, ""), equalTo("select 1 from dual  and 5=6"))
+        assertThat("select 1 from dual /* &m1 */ and 5=6".replace(regex, "xxx"),
+                equalTo("select 1 from dual /* xxx */ and 5=6"))
     }
 
+    @Test(expected = DuplicateMacrosNameException::class)
+    fun shouldThrowErrorIfDefineSameMacrosTwice() {
+        val query = QueryDsl(TestParam("a", "b", null))
+
+        query.run {
+            m("m1") {
+
+            }
+            m("m1") {
+
+            }
+        }
+    }
 }
 
 data class TestParam(val a: String?, val b: String?, val c: String?)

@@ -2,29 +2,21 @@ package com.github.dsulimchuk.dynamicquery.core
 
 import mu.KLogging
 import java.util.*
-import kotlin.text.RegexOption.IGNORE_CASE
 
 /**
  * @author Dmitrii Sulimchuk
  * created 19/10/16
  */
-class QueryDsl<T : Any> {
-    companion object : KLogging() {
-        private val whereThenAndReplaceRegex = Regex("where +and", IGNORE_CASE)
-        private val doubleAndregex = Regex("and +and", IGNORE_CASE)
-    }
+class QueryDsl<T : Any>(val parameter: T) {
+    companion object : KLogging()
 
-    val parameter: T
     var sourceQuery: String = ""
     val macroses = HashMap<String, Macros<T>>()
-
-    internal constructor(parameter: T) {
-        this.parameter = parameter
-    }
+    var countAllProjection: String = "count(*)"
 
     fun m(macrosName: String, init: Macros<T>.() -> Unit): Macros<T> {
         if (macroses.contains(macrosName)) {
-            throw RuntimeException("duplicate macros name $macrosName for $this")
+            throw DuplicateMacrosNameException("duplicate macros name $macrosName for $this")
         }
         val marcos = Macros<T>(macrosName)
         marcos.init()
@@ -40,36 +32,41 @@ class QueryDsl<T : Any> {
     }
 
 
-    fun prepareText(): String {
-        var result = sourceQuery
-        val preparedMacroses = prepareMacroses()
+    fun prepareText(forCountAll: Boolean = false): String {
+        val result = prepareMacroses()
+                .asIterable()
+                .fold(sourceQuery,
+                        { query, entry -> query.replace(keyToCommentRegex(entry.key), entry.value) })
 
-        //replace placeholder to macros value
-        preparedMacroses.forEach {
-            result = result.replace(keyToCommentRegex(it.key), it.value)
+        logger.debug { "prepareText = $result" }
+
+        if (forCountAll) {
+            val fromTokenIndex = result.indexOf("from", 0, true)
+            if (fromTokenIndex == -1) throw QueryParsingException("cannot find \"from\" token in query=$result")
+
+            return result.replaceRange(0, fromTokenIndex, "select $countAllProjection ")
         }
-
-        //cleanup possible duplicates
-        val replace = result
-                .replace(whereThenAndReplaceRegex, "where")
-                .replace(doubleAndregex, "and")
-
-        logger.debug { "prepareText = $replace" }
-
-        return replace
+        return result
     }
 
     internal fun prepareMacroses(): Map<String, String> {
         return macroses
                 .map {
-                    val macrosText = it.value.testers.asSequence()
+                    val suitableText: List<String> = it.value.testers
                             .filter { checkContition(it) }
-                            .map { it.macrosText }
-                            .joinToString(" ")
-                            .trim()
-                            .let { if (it.isBlank()) "(1=1)" else it }
+                            .map { it.text() }
 
-                    it.key to macrosText
+                    val resultingText = when (suitableText.size) {
+                        0 -> "(1=1)"
+                        1 -> suitableText.first().toString()
+                        else -> suitableText.joinToString(
+                                separator = " and ",
+                                prefix = "(",
+                                postfix = ")"
+                        )
+                    }
+
+                    it.key to resultingText
                 }.toMap()
     }
 
@@ -85,20 +82,18 @@ class QueryDsl<T : Any> {
      * select 1
      *   from dual
      *  where 1 = 1
-     *    --&m1
-     *    /*&m2 */
+     *    and &m1
+     *     or &m2
      *
-     * where --&m1 and  /*&m2*/ is a valid placeholders
+     * where &m1 and  &m2 is a valid placeholders
      */
-    internal fun keyToCommentRegex(key: String?) = "(-- *&$key[^\n]*)|(/\\* *&$key *\\*/)|(&$key)".toRegex()
+    internal fun keyToCommentRegex(key: String?) = "(&$key)".toRegex()
 
     override fun toString(): String {
         return "QueryDsl(parameter=$parameter, sourceQuery='$sourceQuery', macroses=$macroses)"
     }
 }
 
-fun <T : Any> query(param: T, init: QueryDsl<T>.() -> Unit): QueryDsl<T> {
-    val root = QueryDsl(param)
-    root.init()
-    return root
-}
+
+
+

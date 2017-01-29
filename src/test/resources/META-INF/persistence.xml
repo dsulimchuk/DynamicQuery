@@ -5,6 +5,7 @@
     <persistence-unit name="test">
         <class>com.github.dsulimchuk.dynamicquery.testmodel.Service</class>
         <class>com.github.dsulimchuk.dynamicquery.testmodel.User</class>
+        <class>com.github.dsulimchuk.dynamicquery.testmodel.Branch</class>
 
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>

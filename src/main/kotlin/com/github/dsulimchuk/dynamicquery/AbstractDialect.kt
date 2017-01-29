@@ -21,7 +21,7 @@ abstract class AbstractDialect {
         return params
     }
 
-    internal fun isBaseType(parameter: Any): Boolean {
+    protected fun isBaseType(parameter: Any): Boolean {
         return when (parameter) {
             is Float,
             is Double,
