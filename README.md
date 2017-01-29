@@ -12,7 +12,7 @@ Now you can do it - just look:
     private val query = Sql<SearchCriteria> {
         +"""
 select t.*
-  from (select t.*
+  from (select u.*
               ,s.name service_name
               ,b.name branch_name
           from users u
