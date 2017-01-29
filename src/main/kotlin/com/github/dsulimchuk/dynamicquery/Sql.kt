@@ -10,17 +10,16 @@ import javax.persistence.Query
  * @author Dmitrii Sulimchuk
  * created 23/10/16
  */
-class Sql<T : Any>(val entityManager: () -> EntityManager,
-                   val initQueryDsl: QueryDsl<T>.() -> Unit)
+class Sql<T : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit)
 : AbstractDialect() {
     companion object : KLogging()
 
-    fun prepare(parameter: T): Query {
+    fun prepare(em: EntityManager, parameter: T): Query {
         val query = QueryDsl(parameter)
         query.initQueryDsl()
 
         val queryText = query.prepareText()
-        val result = entityManager.invoke().createNativeQuery(queryText)
+        val result = em.createNativeQuery(queryText)
 
         val allParameters = findAllQueryParameters(queryText)
 

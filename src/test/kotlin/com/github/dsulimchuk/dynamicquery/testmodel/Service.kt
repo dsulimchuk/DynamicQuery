@@ -1,10 +1,7 @@
 package com.github.dsulimchuk.dynamicquery.testmodel
 
 import java.util.*
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
-import javax.persistence.ManyToMany
+import javax.persistence.*
 
 /**
  * @author Dmitrii Sulimchuk
@@ -16,10 +13,13 @@ class Service {
     @GeneratedValue
     var id: Long? = null
 
-    val name: String? = null
+    var name: String? = null
 
     @ManyToMany(mappedBy = "services")
-    val users: MutableList<User> = ArrayList()
+    var users: MutableList<User> = ArrayList()
+
+    @ManyToOne
+    var branch: Branch? = null
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

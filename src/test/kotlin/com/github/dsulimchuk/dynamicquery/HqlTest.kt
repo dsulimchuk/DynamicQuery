@@ -64,6 +64,7 @@ class HqlTest {
             m("macros") {
                 test({ parameter.salary != null }) {
                     +"salary > :salary"
+                    +"1 = 1"
                 }
             }
         }
@@ -132,11 +133,11 @@ class HqlTest {
         }
 
         val result: QueryResult<Service> = dsl.execute(em,
-                Service::class.java,
-                listOf(1, 2, 3, 5),
-                1,
-                2,
-                {
+                resultClass = Service::class.java,
+                parameter = listOf(1, 2, 3, 5),
+                offset = 1,
+                limit = 2,
+                additionalParams = {
                     it.setHint(QueryHints.COMMENT, "ffdf")
                     it.setHint(QueryHints.FETCH_SIZE, 10000)
                 })

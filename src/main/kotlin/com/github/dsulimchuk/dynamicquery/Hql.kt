@@ -77,11 +77,11 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
         additionalParams(query)
 
         if (offset != null) {
-            query.setFirstResult(offset)
+            query.firstResult = offset
         }
 
         if (limit != null) {
-            query.setMaxResults(limit)
+            query.maxResults = limit
         }
 
         return QueryResult(offset, limit, total, query.resultList)
