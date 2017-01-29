@@ -15,7 +15,7 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
     companion object : KLogging()
 
     /**
-     * todo
+     * Prepare untyped query
      */
     fun prepare(em: EntityManager, parameter: T): Query {
         val dsl = makeDsl(parameter)
@@ -26,7 +26,7 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
     }
 
     /**
-     * todo
+     * Prepare typed query
      */
     fun prepareTyped(em: EntityManager, resultClass: Class<R>, parameter: T): TypedQuery<R> {
         val dsl = makeDsl(parameter)
@@ -37,7 +37,8 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
     }
 
     /**
-     * todo
+     * execute count all query and than actual query
+     * @return data paged data with total rows count
      */
     fun execute(em: EntityManager,
                 resultClass: Class<R>,

@@ -14,6 +14,9 @@ class Sql<T : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit)
 : AbstractDialect() {
     companion object : KLogging()
 
+    /**
+     * Prepare native query
+     */
     fun prepare(em: EntityManager, parameter: T): Query {
         val query = QueryDsl(parameter)
         query.initQueryDsl()
