@@ -37,8 +37,10 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
     }
 
     /**
-     * execute count all query and than actual query
-     * @return data paged data with total rows count
+     * execute count all query and then data query
+     * if (offset ?: 0 == 0 && limit != 0) -> count all query not executed
+     * if (limit == 0 || countQuery return 0) -> data query not executed
+     * @return paged data with total rows count
      */
     fun execute(em: EntityManager,
                 resultClass: Class<R>,
@@ -49,15 +51,16 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
     ): QueryResult<R> {
         val dsl = makeDsl(parameter)
 
-        val total = selectTotal(dsl, em)
-        if (total == 0L) {
-            return QueryResult(offset, limit, total, emptyList())
-        }
+        val total: Long? = selectTotal(dsl, em, limit, offset)
+        val data = selectData(dsl, em, offset, limit, total, resultClass, additionalParams)
 
-        return selectData(dsl, em, offset, limit, total, resultClass, additionalParams)
+        return QueryResult(offset, limit, total ?: data.size.toLong(), data)
     }
 
-    private fun selectTotal(dsl: QueryDsl<T>, em: EntityManager): Long {
+    //return null if there is no sense to do a query
+    private fun selectTotal(dsl: QueryDsl<T>, em: EntityManager, limit: Int?, offset: Int?): Long? {
+        if (offset ?: 0 == 0 && limit != 0) return null
+
         return em.createQuery(dsl.prepareText(true))
                 .setAllQueryParameters(dsl)
                 .singleResult as Long
@@ -67,10 +70,12 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
                            em: EntityManager,
                            offset: Int?,
                            limit: Int?,
-                           total: Long,
+                           total: Long?,
                            resultClass: Class<R>,
-                           additionalParams: (query: TypedQuery<R>) -> Unit
-    ): QueryResult<R> {
+                           additionalParams: (query: TypedQuery<R>) -> Unit): List<R> {
+        //if we already know that there are no results -> exit
+        if (total == 0L || limit == 0) return emptyList()
+
         val query = em
                 .createQuery(dsl.prepareText(), resultClass)
                 .setAllQueryParameters(dsl)
@@ -85,7 +90,7 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
             query.maxResults = limit
         }
 
-        return QueryResult(offset, limit, total, query.resultList)
+        return query.resultList
     }
 
     private fun Hql<T, R>.makeDsl(parameter: T): QueryDsl<T> {
