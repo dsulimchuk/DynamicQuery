@@ -199,11 +199,11 @@ class HqlTest {
                     it.setHint(QueryHints.FETCH_SIZE, 10000)
                 })
 
-//        assertThat(result, notNullValue())
-//        assertThat(result.offset, nullValue())
-//        assertThat(result.limit, nullValue())
-//        assertThat(result.countAll, equalTo(4L))
-//        assertThat(result.result, notNullValue())
+        assertThat(result, notNullValue())
+        assertThat(result.offset, nullValue())
+        assertThat(result.limit, nullValue())
+        assertThat(result.countAll, equalTo(4L))
+        assertThat(result.result, notNullValue())
         assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
     }
 
