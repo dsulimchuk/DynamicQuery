@@ -8,6 +8,8 @@
         <class>com.github.dsulimchuk.dynamicquery.testmodel.Branch</class>
 
         <properties>
+            <property name="hibernate.session_factory.statement_inspector"
+              value="com.github.dsulimchuk.dynamicquery.hibernate.StatementInspectorImpl"/>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
             <property name="javax.persistence.jdbc.url"
                       value="jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1;MVCC=TRUE;MODE=Oracle"/>

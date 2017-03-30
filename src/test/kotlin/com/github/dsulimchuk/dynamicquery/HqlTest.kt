@@ -1,8 +1,8 @@
 package com.github.dsulimchuk.dynamicquery
 
+import com.github.dsulimchuk.dynamicquery.hibernate.StatementInspectorImpl
 import com.github.dsulimchuk.dynamicquery.testmodel.Service
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.*
 import org.hibernate.annotations.QueryHints
 import org.junit.After
 import org.junit.Assert.assertThat
@@ -127,6 +127,8 @@ class HqlTest {
 
     @Test
     fun testPagedQueryWithListParameter() {
+        StatementInspectorImpl.reset()
+
         val dsl = Hql<List<Long>, Service> {
             +"select s from services s join s.users u where s.id in :parameter"
             countAllProjection = "count(distinct s)"
@@ -147,10 +149,14 @@ class HqlTest {
         assertThat(result.limit, equalTo(2))
         assertThat(result.countAll, equalTo(3L))
         assertThat(result.result, notNullValue())
+
+        assertThat("must execute 2 query", StatementInspectorImpl.queryCount(), equalTo(2))
+
     }
 
     @Test
     fun testPagedQueryWithEmptyResult() {
+        StatementInspectorImpl.reset()
         val dsl = Hql<List<Long>, Service> {
             +"select s from services s join s.users u where s.id in :parameter"
             countAllProjection = "count(distinct s)"
@@ -171,5 +177,61 @@ class HqlTest {
         assertThat(result.limit, equalTo(2))
         assertThat(result.countAll, equalTo(0L))
         assertTrue(result.result.isEmpty())
+        assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
+    }
+
+    @Test
+    fun executeWithEmptyLimitAndOffset() {
+        StatementInspectorImpl.reset()
+
+        val dsl = Hql<List<Long>, Service> {
+            +"select s from services s where s.id in :parameter"
+            countAllProjection = "count(s)"
+        }
+
+        val result: QueryResult<Service> = dsl.execute(em,
+                resultClass = Service::class.java,
+                parameter = listOf(1, 2, 3, 5),
+                offset = null,
+                limit = null,
+                additionalParams = {
+                    it.setHint(QueryHints.COMMENT, "ffdf")
+                    it.setHint(QueryHints.FETCH_SIZE, 10000)
+                })
+
+        assertThat(result, notNullValue())
+        assertThat(result.offset, nullValue())
+        assertThat(result.limit, nullValue())
+        assertThat(result.countAll, equalTo(4L))
+        assertThat(result.result, notNullValue())
+        assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
+    }
+
+    @Test
+    fun executeWithZeroLimitMustExecuteOnlyPagingQuery() {
+        StatementInspectorImpl.reset()
+
+        val dsl = Hql<List<Long>, Service> {
+            +"select s from services s where s.id in :parameter"
+            countAllProjection = "count(s)"
+        }
+
+        val result: QueryResult<Service> = dsl.execute(em,
+                resultClass = Service::class.java,
+                parameter = listOf(1, 2, 3, 5),
+                offset = null,
+                limit = 0,
+                additionalParams = {
+                    it.setHint(QueryHints.COMMENT, "ffdf")
+                    it.setHint(QueryHints.FETCH_SIZE, 10000)
+                })
+
+        assertThat(result, notNullValue())
+        assertThat(result.offset, nullValue())
+        assertThat(result.limit, equalTo(0))
+        assertThat(result.countAll, equalTo(4L))
+        assertThat(result.result, notNullValue())
+        assertThat(result.result.size, equalTo(0))
+        assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
     }
 }
