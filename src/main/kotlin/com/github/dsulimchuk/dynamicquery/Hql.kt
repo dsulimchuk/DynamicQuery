@@ -38,7 +38,7 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
 
     /**
      * execute count all query and then data query
-     * if (offset ?: 0 == 0 && limit != 0) -> count all query not executed
+     * if (offset ?: 0 == 0 && limit == null) -> count all query not executed
      * if (limit == 0 || countQuery return 0) -> data query not executed
      * @return paged data with total rows count
      */
@@ -59,7 +59,7 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
 
     //return null if there is no sense to do a query
     private fun selectTotal(dsl: QueryDsl<T>, em: EntityManager, limit: Int?, offset: Int?): Long? {
-        if (offset ?: 0 == 0 && limit != 0) return null
+        if (offset ?: 0 == 0 && limit == null) return null
 
         return em.createQuery(dsl.prepareText(true))
                 .setAllQueryParameters(dsl)
