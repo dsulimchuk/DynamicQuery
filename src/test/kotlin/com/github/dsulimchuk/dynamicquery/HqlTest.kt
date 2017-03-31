@@ -234,4 +234,29 @@ class HqlTest {
         assertThat(result.result.size, equalTo(0))
         assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
     }
+
+    @Test
+    fun executeWithNonZeroLimitMustExecute2Queries() {
+        StatementInspectorImpl.reset()
+
+        val dsl = Hql<List<Long>, Service> {
+            +"select s from services s where s.id in :parameter"
+            countAllProjection = "count(s)"
+        }
+
+        val result: QueryResult<Service> = dsl.execute(em,
+                resultClass = Service::class.java,
+                parameter = listOf(1, 2, 3, 5),
+                offset = null,
+                limit = 5
+                )
+
+        assertThat(result, notNullValue())
+        assertThat(result.offset, nullValue())
+        assertThat(result.limit, equalTo(5))
+        assertThat(result.countAll, equalTo(4L))
+        assertThat(result.result, notNullValue())
+        assertThat(result.result.size, equalTo(4))
+        assertThat("must execute 2 queries", StatementInspectorImpl.queryCount(), equalTo(2))
+    }
 }
