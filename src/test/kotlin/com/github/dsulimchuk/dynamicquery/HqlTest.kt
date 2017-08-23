@@ -1,7 +1,10 @@
 package com.github.dsulimchuk.dynamicquery
 
+import com.github.dsulimchuk.dynamicquery.core.QueryParsingException
 import com.github.dsulimchuk.dynamicquery.hibernate.StatementInspectorImpl
 import com.github.dsulimchuk.dynamicquery.testmodel.Service
+import com.github.dsulimchuk.dynamicquery.testmodel.dto.UserWithService
+import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.*
 import org.hibernate.annotations.QueryHints
 import org.junit.After
@@ -249,7 +252,7 @@ class HqlTest {
                 parameter = listOf(1, 2, 3, 5),
                 offset = null,
                 limit = 5
-                )
+        )
 
         assertThat(result, notNullValue())
         assertThat(result.offset, nullValue())
@@ -258,5 +261,51 @@ class HqlTest {
         assertThat(result.result, notNullValue())
         assertThat(result.result.size, equalTo(4))
         assertThat("must execute 2 queries", StatementInspectorImpl.queryCount(), equalTo(2))
+    }
+
+    private val dslWithProjections = Hql<List<Long>, List<Any>> {
+        +"select s from services s join s.users u where s.id in :parameter"
+        countAllProjection = "count(distinct s)"
+        projection["ids"] = "distinct s.id"
+        projection["names"] = "distinct s.name"
+        projection["userWithService"] = "new com.github.dsulimchuk.dynamicquery.testmodel.dto.UserWithService(u.id, s.id)"
+    }
+
+    @Test
+    fun testQueryProjectionsByDefault() {
+        StatementInspectorImpl.reset()
+        val result: List<Any?> = dslWithProjections.prepare(em, listOf(1, 2, 3, 5)).resultList
+
+        assertThat(result, notNullValue())
+        assertThat(result.size, equalTo(4))
+        assertThat(result, CoreMatchers.everyItem(CoreMatchers.instanceOf(Service::class.java)))
+        assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
+    }
+
+    @Test
+    fun testQueryNameProjection() {
+        StatementInspectorImpl.reset()
+        val result: List<Any?> = dslWithProjections.prepare(em, listOf(1, 2, 3, 5), "names").resultList
+
+        assertThat(result, notNullValue())
+        assertThat(result.size, equalTo(3))
+        assertThat(result, CoreMatchers.everyItem(CoreMatchers.instanceOf(String::class.java)))
+        assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
+    }
+
+    @Test
+    fun testQueryUserWithServiceProjection() {
+        StatementInspectorImpl.reset()
+        val result: List<Any?> = dslWithProjections.prepare(em, listOf(1, 2, 3, 5), "userWithService").resultList
+
+        assertThat(result, notNullValue())
+        assertThat(result.size, equalTo(4))
+        assertThat(result, CoreMatchers.everyItem(CoreMatchers.instanceOf(UserWithService::class.java)))
+        assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
+    }
+
+    @Test(expected = QueryParsingException::class)
+    fun testQueryNotExistingProjection() {
+        val result: List<Any?> = dslWithProjections.prepare(em, listOf(1, 2, 3, 5), "notExistingProjection").resultList
     }
 }

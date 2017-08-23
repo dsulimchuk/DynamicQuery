@@ -17,22 +17,22 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
     /**
      * Prepare untyped query
      */
-    fun prepare(em: EntityManager, parameter: T): Query {
+    fun prepare(em: EntityManager, parameter: T, projection: String? = null): Query {
         val dsl = makeDsl(parameter)
 
         return em
-                .createQuery(dsl.prepareText())
+                .createQuery(dsl.prepareText(projection))
                 .setAllQueryParameters(dsl)
     }
 
     /**
      * Prepare typed query
      */
-    fun prepareTyped(em: EntityManager, resultClass: Class<R>, parameter: T): TypedQuery<R> {
+    fun prepareTyped(em: EntityManager, resultClass: Class<R>, parameter: T, projection: String? = null): TypedQuery<R> {
         val dsl = makeDsl(parameter)
 
         return em
-                .createQuery(dsl.prepareText(), resultClass)
+                .createQuery(dsl.prepareText(projection), resultClass)
                 .setAllQueryParameters(dsl)
     }
 
@@ -61,7 +61,7 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
     private fun selectTotal(dsl: QueryDsl<T>, em: EntityManager, limit: Int?, offset: Int?): Long? {
         if (offset ?: 0 == 0 && limit == null) return null
 
-        return em.createQuery(dsl.prepareText(true))
+        return em.createQuery(dsl.prepareText(QueryDsl.COUNT_ALL_PROJECTION_NAME))
                 .setAllQueryParameters(dsl)
                 .singleResult as Long
     }

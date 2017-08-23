@@ -80,7 +80,7 @@ class QueryDslTest {
             +"select 1"
         }
 
-        query.prepareText(true)
+        query.prepareText("tratat")
     }
 
     @Test()
@@ -89,7 +89,7 @@ class QueryDslTest {
             +"select 1 from dual"
         }
 
-        val result = query.prepareText(true)
+        val result = query.prepareText(QueryDsl.COUNT_ALL_PROJECTION_NAME)
         assertThat(result, equalTo("select count(*) from dual"))
     }
 
@@ -101,7 +101,7 @@ class QueryDslTest {
             countAllProjection = "count(distict s)"
         }
 
-        val result = query.prepareText(true)
+        val result = query.prepareText(QueryDsl.COUNT_ALL_PROJECTION_NAME)
         assertThat(result, equalTo("select count(distict s) from services s join projects p on s.project_id = p.project_id"))
     }
 
