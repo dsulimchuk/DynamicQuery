@@ -143,7 +143,7 @@ class QueryDslTest {
 
     @Test
     fun keyToCommentRegex() {
-        val regex = QueryDsl("test").keyToCommentRegex("m1")
+        val regex = QueryDsl("test").macrosNameToReplaceString("m1")
 
 
         assertThat("select 1 from dual where &m1".replace(regex, ""), equalTo("select 1 from dual where "))
