@@ -36,7 +36,7 @@ class QueryDsl<T : Any>(val parameter: T) {
         val result = prepareMacroses()
                 .asIterable()
                 .fold(sourceQuery,
-                        { query, entry -> query.replace(keyToCommentRegex(entry.key), entry.value) })
+                        { query, entry -> query.replace(macrosNameToReplaceString(entry.key), entry.value) })
 
         logger.debug { "prepareText = $result" }
 
@@ -71,7 +71,7 @@ class QueryDsl<T : Any>(val parameter: T) {
     }
 
     private fun checkContition(it: Test<T>): Boolean {
-        val result = it.condition.invoke(parameter)
+        val result = it.condition(parameter)
         logger.trace { "checkContition on $parameter with result = $result" }
         return result
     }
@@ -87,7 +87,7 @@ class QueryDsl<T : Any>(val parameter: T) {
      *
      * where &m1 and  &m2 is a valid placeholders
      */
-    internal fun keyToCommentRegex(key: String?) = "(&$key)".toRegex()
+    internal fun macrosNameToReplaceString(key: String) = "&$key"
 
     override fun toString(): String {
         return "QueryDsl(parameter=$parameter, sourceQuery='$sourceQuery', macroses=$macroses)"
