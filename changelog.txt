@@ -6,3 +6,8 @@ Changes in 1.0.1 (March 30, 2017)
 ------------------------------------------------------------------------------------------------------------------------https://hibernate.atlassian.net/projects/HHH/versions/27600
 ** Improvement
     * [DQ01] - Eliminate executing unnecessary queries in Hql.execute method
+
+Changes in 1.0.2 (August 27, 2017)
+------------------------------------------------------------------------------------------------------------------------https://hibernate.atlassian.net/projects/HHH/versions/27600
+** Improvement
+    * [DQ07] - Remove unnecessary regexp creation when building query text
