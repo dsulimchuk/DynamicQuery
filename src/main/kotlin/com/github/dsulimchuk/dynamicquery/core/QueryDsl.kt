@@ -53,7 +53,7 @@ class QueryDsl<T : Any>(val parameter: T) {
         if (projectionName != null) {
             val fromTokenIndex = result.indexOf("from", 0, true)
             if (fromTokenIndex == -1) throw QueryParsingException("cannot find \"from\" token in query=$result")
-            val projection = projection[projectionName] ?: throw QueryParsingException("Could not find $projectionName into $this")
+            val projection = projection[projectionName] ?: throw QueryParsingException("Could not find projection=$projectionName into $this")
             return result.replaceRange(0, fromTokenIndex, "select ${projection} ")
         }
         return result
