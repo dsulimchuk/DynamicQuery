@@ -48,7 +48,7 @@ select t.*
             }
         }
         
-        //you can cpecify additional projections
+        //you can specify additional projections
         projection["service_name"] = "service_name"
     }
 
