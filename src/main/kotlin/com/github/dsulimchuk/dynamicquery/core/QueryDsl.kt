@@ -8,11 +8,21 @@ import java.util.*
  * created 19/10/16
  */
 class QueryDsl<T : Any>(val parameter: T) {
-    companion object : KLogging()
+    companion object : KLogging() {
+        val COUNT_ALL_PROJECTION_NAME = "countAllProjection"
+    }
 
     var sourceQuery: String = ""
     val macroses = HashMap<String, Macros<T>>()
-    var countAllProjection: String = "count(*)"
+    var countAllProjection: String
+        get() = projection[COUNT_ALL_PROJECTION_NAME]!!
+        set(value) {
+            projection[COUNT_ALL_PROJECTION_NAME] = value
+        }
+
+    val projection = HashMap<String, String>().also {
+        it[COUNT_ALL_PROJECTION_NAME] = "count(*)"
+    }
 
     fun m(macrosName: String, init: Macros<T>.() -> Unit): Macros<T> {
         if (macroses.contains(macrosName)) {
@@ -32,7 +42,7 @@ class QueryDsl<T : Any>(val parameter: T) {
     }
 
 
-    fun prepareText(forCountAll: Boolean = false): String {
+    fun prepareText(projectionName: String? = null): String {
         val result = prepareMacroses()
                 .asIterable()
                 .fold(sourceQuery,
@@ -40,11 +50,11 @@ class QueryDsl<T : Any>(val parameter: T) {
 
         logger.debug { "prepareText = $result" }
 
-        if (forCountAll) {
+        if (projectionName != null) {
             val fromTokenIndex = result.indexOf("from", 0, true)
             if (fromTokenIndex == -1) throw QueryParsingException("cannot find \"from\" token in query=$result")
-
-            return result.replaceRange(0, fromTokenIndex, "select $countAllProjection ")
+            val projection = projection[projectionName] ?: throw QueryParsingException("Could not find projection=$projectionName into $this")
+            return result.replaceRange(0, fromTokenIndex, "select ${projection} ")
         }
         return result
     }
@@ -90,8 +100,9 @@ class QueryDsl<T : Any>(val parameter: T) {
     internal fun macrosNameToReplaceString(key: String) = "&$key"
 
     override fun toString(): String {
-        return "QueryDsl(parameter=$parameter, sourceQuery='$sourceQuery', macroses=$macroses)"
+        return "QueryDsl(parameter=$parameter, sourceQuery='$sourceQuery', macroses=$macroses, projections=$projection)"
     }
+
 }
 
 

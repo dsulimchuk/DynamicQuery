@@ -2,16 +2,20 @@ group 'com.github.dsulimchuk.dynamicquery'
 version '1.0.3-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.0.5'
-    ext.dokka_version = '0.9.13'
+    ext.kotlin_version = '1.1.4-3'
+    ext.dokka_version = '0.9.15'
+    ext.detekt_version = '1.0.0.RC5'
 
     repositories {
         mavenCentral()
         jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
     }
+
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
+        classpath "gradle.plugin.io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${detekt_version}"
     }
 }
 
@@ -20,10 +24,21 @@ apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'org.jetbrains.dokka'
+apply plugin: 'idea'
+apply plugin: 'io.gitlab.arturbosch.detekt'
 
 repositories {
     mavenCentral()
-    //jcenter()
+    jcenter()
+}
+
+detekt {
+    version = detekt_version
+    profile("main") {
+        input = "$projectDir/src/main/kotlin"
+        config = "$projectDir/detekt.yml"
+        filters = ".*test.*,.*/resources/.*,.*/tmp/.*"
+    }
 }
 
 task javadocJar(type: Jar) {
@@ -52,7 +67,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile "ch.qos.logback:logback-classic:1.1.7"
-    testCompile 'org.hibernate:hibernate-core:5.2.3.Final'
+    testCompile 'org.hibernate:hibernate-core:5.2.10.Final'
     testCompile 'com.h2database:h2:1.4.191'
 }
 
@@ -62,11 +77,11 @@ uploadArchives {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: findProperty('ossrhUsername'), password: findProperty('ossrhPassword'))
             }
 
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: findProperty('ossrhUsername'), password: findProperty('ossrhPassword'))
             }
 
             pom.project {

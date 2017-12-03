@@ -45,7 +45,7 @@ class QueryDslTest {
         val query = query("param") {
             +queryText
         }
-        assertThat(query.prepareText(), equalTo(queryText))
+        assertThat(query.prepareText(null), equalTo(queryText))
     }
 
     @Test
@@ -61,7 +61,7 @@ class QueryDslTest {
             }
         }
 
-        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 and (a=b and c=d)\nor &m2"))
+        assertThat(query.prepareText(null), equalTo("select 1 from dual where 1=1 and (a=b and c=d)\nor &m2"))
 
         query.run {
             m("m2") {
@@ -71,7 +71,7 @@ class QueryDslTest {
                 }
             }
         }
-        assertThat(query.prepareText(), equalTo("select 1 from dual where 1=1 and (a=b and c=d)\nor (x=y and 1=2)"))
+        assertThat(query.prepareText(null), equalTo("select 1 from dual where 1=1 and (a=b and c=d)\nor (x=y and 1=2)"))
     }
 
     @Test(expected = QueryParsingException::class)
@@ -80,7 +80,7 @@ class QueryDslTest {
             +"select 1"
         }
 
-        query.prepareText(true)
+        query.prepareText("tratat")
     }
 
     @Test()
@@ -89,7 +89,7 @@ class QueryDslTest {
             +"select 1 from dual"
         }
 
-        val result = query.prepareText(true)
+        val result = query.prepareText(QueryDsl.COUNT_ALL_PROJECTION_NAME)
         assertThat(result, equalTo("select count(*) from dual"))
     }
 
@@ -101,7 +101,7 @@ class QueryDslTest {
             countAllProjection = "count(distict s)"
         }
 
-        val result = query.prepareText(true)
+        val result = query.prepareText(QueryDsl.COUNT_ALL_PROJECTION_NAME)
         assertThat(result, equalTo("select count(distict s) from services s join projects p on s.project_id = p.project_id"))
     }
 

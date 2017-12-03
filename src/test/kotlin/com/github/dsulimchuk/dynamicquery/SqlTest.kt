@@ -64,7 +64,7 @@ class SqlTest {
     @Test
     fun testExampleQuery() {
         val result = query
-                .prepare(em, SearchCriteria(null, "viktor", 10.0, "service_name"))
+                .prepare(em, SearchCriteria(null, "viktor", 10.0, "service_name"), "z")
                 .resultList
     }
 
@@ -83,6 +83,7 @@ select t.*
   order by &orderMacros
 
 """
+        projection["z"] = "t.id"
 
         //now we can declare macros m1. At runtime it will be computed on given search Criteria
         m("m1") {
