@@ -17,7 +17,18 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
     /**
      * Prepare untyped query
      */
-    fun prepare(em: EntityManager, parameter: T, projection: String? = null): Query {
+    fun prepare(em: EntityManager, parameter: T): Query {
+        val dsl = makeDsl(parameter)
+
+        return em
+                .createQuery(dsl.prepareText(null))
+                .setAllQueryParameters(dsl)
+    }
+
+    /**
+     * Prepare untyped query with specific projection
+     */
+    fun prepare(em: EntityManager, parameter: T, projection: String): Query {
         val dsl = makeDsl(parameter)
 
         return em
