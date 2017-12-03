@@ -1,2 +1,2 @@
 language: java
-install: ./gradlew assemble -x signArchives
+script: ./gradlew assemble -x signArchives
