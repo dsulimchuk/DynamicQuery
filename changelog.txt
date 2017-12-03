@@ -10,4 +10,9 @@ Changes in 1.0.1 (March 30, 2017)
 Changes in 1.0.2 (August 27, 2017)
 ------------------------------------------------------------------------------------------------------------------------https://hibernate.atlassian.net/projects/HHH/versions/27600
 ** Improvement
-    * [DQ07] - Remove unnecessary regexp creation when building query text
+    * [DQ02] - Remove unnecessary regexp creation when building query text
+
+Changes in 1.0.3 (December 3, 2017)
+------------------------------------------------------------------------------------------------------------------------https://hibernate.atlassian.net/projects/HHH/versions/27600
+** Improvement
+    * [DQ03] - Add support for different projections
