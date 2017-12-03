@@ -47,6 +47,9 @@ select t.*
                 +parameter.sort
             }
         }
+        
+        //you can cpecify additional projections
+        projection["service_name"] = "service_name"
     }
 
     data class SearchCriteria(val id: Long?,
@@ -61,10 +64,22 @@ select t.*
 now we simply call prepare method and pass entityManager with actual parameters
 ``` kotlin
     @Test
-    fun testExampleQuery() {
+    fun exampleQuery() {
+        val sq = SearchCriteria(null, "viktor", 10.0, "branch_name, service_name")
         val result = query
-                .prepare(em, SearchCriteria(null, "viktor", 10.0, "branch_name, service_name"))
+                .prepare(em, sq)
                 .resultList
+        assertNotNull(result)
+    }
+
+
+    @Test
+    fun exampleQueryWithSpecificProjection() {
+        val sq = SearchCriteria(null, "viktor", 10.0, "branch_name, service_name")
+        val result = query
+                .prepare(em, sq, "service_name")
+                .resultList as List<String>
+        assertNotNull(result)
     }
 ```    
 
