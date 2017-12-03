@@ -17,11 +17,11 @@ class Sql<T : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit)
     /**
      * Prepare native query
      */
-    fun prepare(em: EntityManager, parameter: T): Query {
+    fun prepare(em: EntityManager, parameter: T, projection: String? = null): Query {
         val query = QueryDsl(parameter)
         query.initQueryDsl()
 
-        val queryText = query.prepareText()
+        val queryText = query.prepareText(projection)
         val result = em.createNativeQuery(queryText)
 
         val allParameters = findAllQueryParameters(queryText)

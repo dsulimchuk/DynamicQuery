@@ -121,7 +121,7 @@ class HqlTest {
             +"select s from services s where s.id in :parameter"
         }
 
-        val list = dsl.prepareTyped(em, Service::class.java, listOf(1, 2, 3, 5)).resultList
+        val list = dsl.prepareTyped(em, Service::class.java, listOf(1L, 2, 3, 5)).resultList
 
         assertThat(list, notNullValue())
         assertThat(list.size, equalTo(4))
@@ -263,7 +263,7 @@ class HqlTest {
         assertThat("must execute 2 queries", StatementInspectorImpl.queryCount(), equalTo(2))
     }
 
-    private val dslWithProjections = Hql<List<Long>, List<Any>> {
+    private val dslWithProjections = Hql<List<Long>, Any> {
         +"select s from services s join s.users u where s.id in :parameter"
         countAllProjection = "count(distinct s)"
         projection["ids"] = "distinct s.id"
@@ -296,7 +296,7 @@ class HqlTest {
     @Test
     fun testQueryUserWithServiceProjection() {
         StatementInspectorImpl.reset()
-        val result: List<Any?> = dslWithProjections.prepare(em, listOf(1, 2, 3, 5), "userWithService").resultList
+        val result: MutableList<UserWithService> = dslWithProjections.prepareTyped(em, UserWithService::class.java, listOf(1L, 2, 3, 5), "userWithService").resultList
 
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(4))
@@ -306,6 +306,8 @@ class HqlTest {
 
     @Test(expected = QueryParsingException::class)
     fun testQueryNotExistingProjection() {
-        val result: List<Any?> = dslWithProjections.prepare(em, listOf(1, 2, 3, 5), "notExistingProjection").resultList
+        dslWithProjections
+                .prepareTyped(em, Long::class.java, listOf(1L, 2, 3, 5), "notExistingProjection")
+                .resultList
     }
 }

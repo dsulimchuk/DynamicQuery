@@ -28,7 +28,10 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
     /**
      * Prepare typed query
      */
-    fun prepareTyped(em: EntityManager, resultClass: Class<R>, parameter: T, projection: String? = null): TypedQuery<R> {
+    fun <RR : R, TT : T> prepareTyped(em: EntityManager,
+                                      resultClass: Class<RR>,
+                                      parameter: TT,
+                                      projection: String? = null): TypedQuery<RR> {
         val dsl = makeDsl(parameter)
 
         return em
