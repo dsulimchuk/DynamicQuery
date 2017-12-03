@@ -3,6 +3,7 @@ package com.github.dsulimchuk.dynamicquery
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.After
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -62,10 +63,22 @@ class SqlTest {
     }
 
     @Test
-    fun testExampleQuery() {
+    fun exampleQuery() {
+        val sq = SearchCriteria(null, "viktor", 10.0, "branch_name, service_name")
         val result = query
-                .prepare(em, SearchCriteria(null, "viktor", 10.0, "service_name"), "z")
+                .prepare(em, sq)
                 .resultList
+        assertNotNull(result)
+    }
+
+
+    @Test
+    fun exampleQueryWithSpecificProjection() {
+        val sq = SearchCriteria(null, "viktor", 10.0, "branch_name, service_name")
+        val result = query
+                .prepare(em, sq, "service_name")
+                .resultList as List<String>
+        assertNotNull(result)
     }
 
     private val query = Sql<SearchCriteria> {
@@ -83,7 +96,7 @@ select t.*
   order by &orderMacros
 
 """
-        projection["z"] = "t.id"
+        projection["service_name"] = "service_name"
 
         //now we can declare macros m1. At runtime it will be computed on given search Criteria
         m("m1") {
