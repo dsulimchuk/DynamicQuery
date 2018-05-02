@@ -10,7 +10,7 @@ class Test<in T>(val condition: (T) -> Boolean) {
     }
 
     operator fun String.unaryPlus() {
-        if (this.isNotBlank() && counter++ > 0) macrosText += " and "
-        macrosText += this.trim()
+        if (this.isEmpty()) return
+        macrosText += if (counter++ > 0) " and $this" else this
     }
 }

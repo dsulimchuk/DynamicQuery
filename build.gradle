@@ -2,9 +2,9 @@ group 'com.github.dsulimchuk.dynamicquery'
 version '1.0.4-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.1.4-3'
-    ext.dokka_version = '0.9.15'
-    ext.detekt_version = '1.0.0.RC5'
+    ext.kotlin_version = '1.2.31'
+    ext.dokka_version = '0.9.16'
+    ext.detekt_version = '1.0.0.RC6-4'
 
     repositories {
         mavenCentral()
@@ -64,6 +64,7 @@ dependencies {
     compile "io.github.microutils:kotlin-logging:1.4"
     compile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final"
     compile 'commons-beanutils:commons-beanutils:1.9.2'
+    compile 'org.apache.commons:commons-lang3:3.7'
 
     testCompile 'junit:junit:4.12'
     testCompile "ch.qos.logback:logback-classic:1.1.7"
