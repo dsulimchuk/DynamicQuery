@@ -16,3 +16,8 @@ Changes in 1.0.3 (December 3, 2017)
 ------------------------------------------------------------------------------------------------------------------------https://hibernate.atlassian.net/projects/HHH/versions/27600
 ** Improvement
     * [DQ03] - Add support for different projections
+
+Changes in 1.0.4 (May 2, 2018)
+------------------------------------------------------------------------------------------------------------------------https://hibernate.atlassian.net/projects/HHH/versions/27600
+** Improvement
+    * [DQ04] - Optimization working with Strings
