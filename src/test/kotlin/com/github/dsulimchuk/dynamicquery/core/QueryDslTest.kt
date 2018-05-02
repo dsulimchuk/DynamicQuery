@@ -135,29 +135,10 @@ class QueryDslTest {
         val result = query.prepareMacroses()
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(2))
-        assertThat(result["m1"], allOf(containsString("x = :a"), containsString("y = :b")))
-        assertThat(result["m2"], containsString("1=1"))
+        assertThat(result["&m1"], allOf(containsString("x = :a"), containsString("y = :b")))
+        assertThat(result["&m2"], containsString("1=1"))
 
 
-    }
-
-    @Test
-    fun keyToCommentRegex() {
-        val regex = QueryDsl("test").macrosNameToReplaceString("m1")
-
-
-        assertThat("select 1 from dual where &m1".replace(regex, ""), equalTo("select 1 from dual where "))
-
-        assertThat("select 1 from dual &m1".replace(regex, ""), equalTo("select 1 from dual "))
-        assertThat("select 1 from dual &m1 \n and 5=6".replace(regex, ""),
-                equalTo("select 1 from dual  \n and 5=6"))
-        assertThat("select 1 from dual &m1 \nand 5=6".replace(regex, ""),
-                equalTo("select 1 from dual  \nand 5=6"))
-        assertThat("select 1 from dual where &m1 and 2=2".replace(regex, "1=2"),
-                equalTo("select 1 from dual where 1=2 and 2=2"))
-
-        assertThat("select 1 from dual /* &m1 */ and 5=6".replace(regex, "xxx"),
-                equalTo("select 1 from dual /* xxx */ and 5=6"))
     }
 
     @Test(expected = DuplicateMacrosNameException::class)
