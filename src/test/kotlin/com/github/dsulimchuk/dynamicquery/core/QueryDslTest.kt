@@ -105,6 +105,26 @@ class QueryDslTest {
         assertThat(result, equalTo("select count(distict s) from services s join projects p on s.project_id = p.project_id"))
     }
 
+    @Test()
+    fun testReplaceDifferentMacrosesWithSamePrefix() {
+        val query = query("param") {
+            +"select 1 from services s where &macros1 and &macros1ButDifferent"
+            m("macros1") {
+                test({ true }) {
+                    +"5=5"
+                }
+            }
+            m("macros1ButDifferent") {
+                test({ true }) {
+                    +"6=6"
+                }
+            }
+        }
+
+        val result = query.prepareText()
+        assertThat(result, equalTo("select 1 from services s where 5=5 and 6=6"))
+    }
+
     @Test
     fun prepareMacroses_for_empty_macroses() {
         val query = QueryDsl(TestParam("a", "b", null))
