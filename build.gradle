@@ -1,5 +1,5 @@
 group 'com.github.dsulimchuk.dynamicquery'
-version '1.0.5'
+version '1.0.6-SNAPSHOT'
 
 buildscript {
     ext.kotlin_version = '1.2.31'
