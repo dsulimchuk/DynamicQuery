@@ -14,7 +14,7 @@ class QueryDsl<T : Any>(val parameter: T) {
     }
 
     var sourceQuery: String = ""
-    val macroses = HashMap<String, Macros<T>>()
+    val macroses = TreeMap<String, Macros<T>>(reverseOrder())
     var countAllProjection: String
         get() = projection[COUNT_ALL_PROJECTION_NAME]!!
         set(value) {
