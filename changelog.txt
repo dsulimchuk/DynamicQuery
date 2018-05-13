@@ -3,21 +3,26 @@ Dynamic-Query Changelog
 
 
 Changes in 1.0.1 (March 30, 2017)
-------------------------------------------------------------------------------------------------------------------------https://hibernate.atlassian.net/projects/HHH/versions/27600
+------------------------------------------------------------------------------------------------------------------------
 ** Improvement
     * [DQ01] - Eliminate executing unnecessary queries in Hql.execute method
 
 Changes in 1.0.2 (August 27, 2017)
-------------------------------------------------------------------------------------------------------------------------https://hibernate.atlassian.net/projects/HHH/versions/27600
+------------------------------------------------------------------------------------------------------------------------
 ** Improvement
     * [DQ02] - Remove unnecessary regexp creation when building query text
 
 Changes in 1.0.3 (December 3, 2017)
-------------------------------------------------------------------------------------------------------------------------https://hibernate.atlassian.net/projects/HHH/versions/27600
+------------------------------------------------------------------------------------------------------------------------
 ** Improvement
     * [DQ03] - Add support for different projections
 
 Changes in 1.0.4 (May 2, 2018)
-------------------------------------------------------------------------------------------------------------------------https://hibernate.atlassian.net/projects/HHH/versions/27600
+------------------------------------------------------------------------------------------------------------------------
 ** Improvement
     * [DQ04] - Optimization working with Strings
+
+Changes in 1.0.5 (May 13, 2018)
+------------------------------------------------------------------------------------------------------------------------
+** Bugfix
+    * [DQ05] - If macroses have common prefix one of them can be changed by mistake
