@@ -34,7 +34,7 @@ class SqlTest {
     fun testQueryWithOneParameter() {
         val list = Sql<Long> { +"select 1 from dual where :parameter.aa.b = 6" }
                 .prepare(em, 6)
-                .resultList as List<Long>
+            .resultList as List<*>
 
         assertThat(list, notNullValue())
         assertThat(list.size, equalTo(1))
@@ -46,7 +46,7 @@ class SqlTest {
 
         val list = Sql<SearchCriteria> { +"select 1 from dual where :a = 1 and :b = 2 and :c = 3" }
                 .prepare(em, SearchCriteria(1, 2, 3))
-                .resultList as List<Long>
+            .resultList as List<*>
 
         assertThat(list, notNullValue())
         assertThat(list.size, equalTo(1))
@@ -56,7 +56,7 @@ class SqlTest {
     fun testQueryWithListParameter() {
         val list = Sql<List<Long>> { +"select 1 from dual where 1 in :parameter" }
                 .prepare(em, listOf(1, 2, 3, 4, 5))
-                .resultList as List<Long>
+            .resultList as List<*>
 
         assertThat(list, notNullValue())
         assertThat(list.size, equalTo(1))
@@ -77,7 +77,7 @@ class SqlTest {
         val sq = SearchCriteria(null, "viktor", 10.0, "branch_name, service_name")
         val result = query
                 .prepare(em, sq, "service_name")
-                .resultList as List<String>
+            .resultList as List<*>
         assertNotNull(result)
     }
 
@@ -91,7 +91,8 @@ select t.*
                  left join users_services t on (u.id = t.users_id)
                  left join services s on (t.services_id = s.id)
                  left join branches b on (s.branch_id = b.id)
-         where &m1
+         where 1=1
+           &m1
         )t
   order by &orderMacros
 
@@ -101,13 +102,13 @@ select t.*
         //now we can declare macros m1. At runtime it will be computed on given search Criteria
         m("m1") {
             test({ parameter.id != null }) {
-                +"t.id = :id"
+                +"and t.id = :id"
             }
             test({ !parameter.name.isNullOrEmpty() }) {
-                +"upper(s.name) like upper(:name)"
+                +"and upper(s.name) like upper(:name)"
             }
             test({ parameter.salary != null }) {
-                +"u.salary < :salary"
+                +"and u.salary < :salary"
             }
         }
 

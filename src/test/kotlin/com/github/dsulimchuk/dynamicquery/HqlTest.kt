@@ -62,12 +62,12 @@ class HqlTest {
             select distinct t
               from services t join t.users u
              where upper(u.name) like upper(:name||'%')
-               and &macros
+               &macros
 """
             m("macros") {
                 test({ parameter.salary != null }) {
-                    +"salary > :salary"
-                    +"1 = 1"
+                    +"and salary > :salary"
+                    +"and 1 = 1"
                 }
             }
         }
