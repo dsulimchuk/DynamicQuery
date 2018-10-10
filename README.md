@@ -19,7 +19,8 @@ select t.*
                  left join users_services t on (u.id = t.users_id)
                  left join services s on (t.services_id = s.id)
                  left join branches b on (s.branch_id = b.id)
-         where &m1
+         where 1=1
+           &m1
         )t
   order by &orderMacros
 
@@ -28,13 +29,13 @@ select t.*
         //now we can declare macros m1. At runtime it will be computed on given search Criteria
         m("m1") {
             test({ parameter.id != null }) {
-                +"t.id = :id"
+                +"and u.id = :id"
             }
             test({ !parameter.name.isNullOrEmpty() }) {
-                +"upper(s.name) like upper(:name)"
+                +"and upper(s.name) like upper(:name)"
             }
             test({ parameter.salary != null }) {
-                +"u.salary < :salary"
+                +"and u.salary < :salary"
             }
         }
 
@@ -89,6 +90,6 @@ now we simply call prepare method and pass entityManager with actual parameters
 <dependency>
     <groupId>com.github.dsulimchuk.dynamicquery</groupId>
     <artifactId>dynamic-query</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
 </dependency>
 ```

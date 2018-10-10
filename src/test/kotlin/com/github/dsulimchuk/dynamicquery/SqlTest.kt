@@ -64,7 +64,7 @@ class SqlTest {
 
     @Test
     fun exampleQuery() {
-        val sq = SearchCriteria(null, "viktor", 10.0, "branch_name, service_name")
+        val sq = SearchCriteria(1, "viktor", 10.0, "branch_name, service_name")
         val result = query
                 .prepare(em, sq)
                 .resultList
@@ -102,7 +102,7 @@ select t.*
         //now we can declare macros m1. At runtime it will be computed on given search Criteria
         m("m1") {
             test({ parameter.id != null }) {
-                +"and t.id = :id"
+                +"and u.id = :id"
             }
             test({ !parameter.name.isNullOrEmpty() }) {
                 +"and upper(s.name) like upper(:name)"
