@@ -56,7 +56,7 @@ class QueryDsl<T : Any>(val parameter: T) {
             val fromTokenIndex = result.indexOf("from", 0, true)
             if (fromTokenIndex == -1) throw QueryParsingException("cannot find \"from\" token in query=$result")
             val projection = projection[projectionName]
-                    ?: throw QueryParsingException("Could not find projection=$projectionName into $this")
+                ?: throw QueryParsingException("Could not find projection=$projectionName into $this")
             return result.replaceRange(0, fromTokenIndex, "select ${projection} ")
         }
         return result
@@ -64,22 +64,13 @@ class QueryDsl<T : Any>(val parameter: T) {
 
     internal fun prepareMacroses(): Map<String, String> {
         return macroses
-            .map {
-                val suitableText: List<String> = it.value.testers
+            .map { (macrosName, macros) ->
+                val resultingText: String = macros.testers
+                    .asSequence()
                     .filter { checkContition(it) }
-                    .map { it.text() }
+                    .joinToString(separator = " ", transform = Test<*>::text)
 
-                val resultingText = when (suitableText.size) {
-                    0 -> "(1=1)"
-                    1 -> suitableText.first().toString()
-                    else -> suitableText.joinToString(
-                        separator = " and ",
-                        prefix = "(",
-                        postfix = ")"
-                    )
-                }
-
-                it.key to resultingText
+                macrosName to resultingText
             }.toMap()
     }
 

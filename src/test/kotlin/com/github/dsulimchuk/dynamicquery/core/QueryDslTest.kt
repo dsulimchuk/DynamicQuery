@@ -51,27 +51,26 @@ class QueryDslTest {
     @Test
     fun prepare() {
         val query = query("param") {
-            +"select 1 from dual where 1=1 and &m1\nor &m2"
+            +"select 1 from dual where 1=1 &m1\n &m2"
 
             m("m1") {
                 test({ true }) {
-                    +"a=b"
-                    +"c=d"
+                    +"and a=b"
+                    +"and c=d"
                 }
             }
         }
 
-        assertThat(query.prepareText(null), equalTo("select 1 from dual where 1=1 and (a=b and c=d)\nor &m2"))
+        assertThat(query.prepareText(null), equalTo("select 1 from dual where 1=1 and a=b and c=d\n &m2"))
 
         query.run {
             m("m2") {
                 test({ true }) {
-                    +"x=y"
-                    +"1=2"
+                    +"or (x=y and 1=2)"
                 }
             }
         }
-        assertThat(query.prepareText(null), equalTo("select 1 from dual where 1=1 and (a=b and c=d)\nor (x=y and 1=2)"))
+        assertThat(query.prepareText(null), equalTo("select 1 from dual where 1=1 and a=b and c=d\n or (x=y and 1=2)"))
     }
 
     @Test(expected = QueryParsingException::class)
@@ -156,7 +155,7 @@ class QueryDslTest {
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(2))
         assertThat(result["&m1"], allOf(containsString("x = :a"), containsString("y = :b")))
-        assertThat(result["&m2"], containsString("1=1"))
+        assertThat(result["&m2"], equalTo(""))
 
 
     }
