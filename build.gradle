@@ -3,7 +3,7 @@ version '1.0.7-SNAPSHOT'
 
 buildscript {
     ext.kotlin_version = '1.3.60'
-    ext.dokka_version = '0.9.16'
+    ext.dokka_version = "1.4.32"
     ext.detekt_version = '1.0.0.RC6-4'
 
     repositories {
@@ -18,12 +18,12 @@ buildscript {
     }
 }
 
+apply plugin: 'java-library'
 apply plugin: 'kotlin'
 apply plugin: 'jacoco'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'org.jetbrains.dokka'
-apply plugin: 'idea'
 apply plugin: 'io.gitlab.arturbosch.detekt'
 
 repositories {
@@ -41,7 +41,7 @@ detekt {
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
-    from dokka
+    from dokkaJavadoc
 }
 
 task sourcesJar(type: Jar) {
@@ -70,46 +70,56 @@ dependencies {
     testCompile 'com.h2database:h2:1.4.199'
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = 'dynamic-query'
+            version = version
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: findProperty('ossrhUsername'), password: findProperty('ossrhPassword'))
-            }
+            from components.java
 
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: findProperty('ossrhUsername'), password: findProperty('ossrhPassword'))
-            }
-
-            pom.project {
-                name 'dynamic-query'
-                packaging 'jar'
-                // optionally artifactId can be defined here
-                description 'Dynamic Query DSL for JPA (Hibernate) on Kotlin'
-                url 'https://github.com/dsulimchuk/DynamicQuery'
-
-                scm {
-                    connection 'scm:git:https://github.com/dsulimchuk/DynamicQuery.git'
-                    developerConnection 'scm:git:ssh://git@github.com:dsulimchuk/DynamicQuery.git'
-                    url 'https://github.com/dsulimchuk/DynamicQuery'
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
                 }
-
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                description 'Dynamic Query DSL for JPA (Hibernate) on Kotlin'
+                url = 'https://github.com/dsulimchuk/DynamicQuery'
                 licenses {
                     license {
-                        name 'MIT License'
-                        url 'http://www.opensource.org/licenses/mit-license.php'
+                        name = 'MIT License'
+                        url = 'http://www.opensource.org/licenses/mit-license.php'
                     }
                 }
-
                 developers {
                     developer {
-                        id 'dsulimchuk'
-                        name 'Dmitrii Sulimchuk'
-                        email 'dserge.spb@gmail.com'
+                        id = 'dsulimchuk'
+                        name = 'Dmitrii Sulimchuk'
+                        email = 'dserge.spb@gmail.com'
                     }
                 }
+                scm {
+                    connection = 'scm:git:https://github.com/dsulimchuk/DynamicQuery.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:dsulimchuk/DynamicQuery.git'
+                    url = 'https://github.com/dsulimchuk/DynamicQuery'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = findProperty('ossrhUsername')
+                password = findProperty('ossrhPassword')
             }
         }
     }
