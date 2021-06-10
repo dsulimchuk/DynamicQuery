@@ -90,6 +90,6 @@ now we simply call prepare method and pass entityManager with actual parameters
 <dependency>
     <groupId>com.github.dsulimchuk.dynamicquery</groupId>
     <artifactId>dynamic-query</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
 </dependency>
 ```
