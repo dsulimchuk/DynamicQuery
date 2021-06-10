@@ -66,6 +66,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile "ch.qos.logback:logback-classic:1.1.7"
+    testCompile 'javax.xml.bind:jaxb-api:1.0'
     testCompile 'org.hibernate:hibernate-core:5.2.18.Final'
     testCompile 'com.h2database:h2:1.4.199'
 }
