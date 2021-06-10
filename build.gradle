@@ -8,7 +8,6 @@ buildscript {
 
     repositories {
         mavenCentral()
-        jcenter()
         maven { url "https://plugins.gradle.org/m2/" }
     }
 
@@ -29,7 +28,6 @@ apply plugin: 'io.gitlab.arturbosch.detekt'
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 detekt {
@@ -60,11 +58,11 @@ signing {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "io.github.microutils:kotlin-logging:1.6.26"
-    compile "jakarta.persistence:jakarta.persistence-api:2.2.3"
-    compile 'commons-beanutils:commons-beanutils:1.9.4'
-    compile 'org.apache.commons:commons-lang3:3.12.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "io.github.microutils:kotlin-logging:1.6.26"
+    implementation "jakarta.persistence:jakarta.persistence-api:2.2.3"
+    implementation 'commons-beanutils:commons-beanutils:1.9.4'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
 
     testCompile 'junit:junit:4.12'
     testCompile "ch.qos.logback:logback-classic:1.1.7"
