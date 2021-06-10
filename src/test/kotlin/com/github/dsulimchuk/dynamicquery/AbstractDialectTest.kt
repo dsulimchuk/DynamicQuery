@@ -1,9 +1,10 @@
 package com.github.dsulimchuk.dynamicquery
 
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.notNullValue
+import org.junit.Assert.assertThat
+import org.junit.Assert.assertTrue
 import org.junit.Test
-
-import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
@@ -42,7 +43,7 @@ class AbstractDialectQueryDslParametersTest(
         assertThat("size equals", result.size, equalTo(expectedCount))
         assertThat("check that result is unique",
                 result.distinct().size, equalTo(result.size))
-        assertTrue("chech expected params $expectedParams in $result",
+        assertTrue("check expected params $expectedParams in $result",
                 result.containsAll(expectedParams))
     }
 
