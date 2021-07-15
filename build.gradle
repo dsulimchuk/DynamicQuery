@@ -52,11 +52,11 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "io.github.microutils:kotlin-logging:1.6.26"
     implementation "jakarta.persistence:jakarta.persistence-api:2.2.3"
-    implementation 'commons-beanutils:commons-beanutils:1.9.4'
+    implementation 'org.springframework:spring-beans:5.0.20.RELEASE'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
     testCompile 'junit:junit:4.12'
-    testCompile "ch.qos.logback:logback-classic:1.1.7"
+    testCompile "ch.qos.logback:logback-classic:1.2.3"
     testCompile 'javax.xml.bind:jaxb-api:1.0'
     testCompile 'org.hibernate:hibernate-core:5.2.18.Final'
     testCompile 'com.h2database:h2:1.4.199'

@@ -2,7 +2,7 @@ package com.github.dsulimchuk.dynamicquery
 
 import com.github.dsulimchuk.dynamicquery.core.QueryDsl
 import mu.KLogging
-import org.apache.commons.beanutils.PropertyUtils
+import org.springframework.beans.BeanUtils
 import javax.persistence.EntityManager
 import javax.persistence.Query
 import javax.persistence.TypedQuery
@@ -134,12 +134,26 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
             this.setParameter(allParameters.first(), dsl.parameter)
         } else {
             allParameters
-                    .map { it to PropertyUtils.getProperty(dsl.parameter, it.replace("_", ".")) }
+                    .map { it to getProperty(dsl.parameter, it.replace("_", "."))                            }
                     .forEach {
                         logger.debug { "set parameter ${it.first} to ${it.second}" }
                         this.setParameter(it.first, it.second)
                     }
         }
         return this
+    }
+
+    private fun getProperty(parameter: Any, paramName:String):Any? {
+        return if (paramName.contains('.')) {
+            val (highParam, internalParam) = paramName.split('.',limit  = 2)
+            var paramValue =
+                BeanUtils.getPropertyDescriptor(parameter::class.javaObjectType, highParam)?.readMethod?.invoke(parameter)
+            if ((paramValue != null) && (internalParam != null)) {
+                paramValue = getProperty(paramValue, internalParam)
+            }
+            return paramValue
+        }
+        else
+            BeanUtils.getPropertyDescriptor(parameter::class.javaObjectType, paramName)?.readMethod?.invoke(parameter)
     }
 }
