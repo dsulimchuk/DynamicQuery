@@ -2,8 +2,8 @@ group 'com.github.dsulimchuk.dynamicquery'
 version '1.0.8-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.3.60'
-    ext.dokka_version = "1.4.32"
+    ext.kotlin_version = '1.5.32'
+    ext.dokka_version = "1.5.31"
     ext.detekt_version = '1.0.0.RC6-4'
 
     repositories {
@@ -50,16 +50,34 @@ signing {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation "io.github.microutils:kotlin-logging:1.6.26"
+    implementation "io.github.microutils:kotlin-logging-jvm:2.0.13"
     implementation "jakarta.persistence:jakarta.persistence-api:2.2.3"
-    implementation 'org.springframework:spring-beans:5.0.20.RELEASE'
+    implementation 'org.springframework:spring-beans:5.2.17.RELEASE'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
-    testCompile 'junit:junit:4.12'
-    testCompile "ch.qos.logback:logback-classic:1.2.3"
-    testCompile 'javax.xml.bind:jaxb-api:1.0'
-    testCompile 'org.hibernate:hibernate-core:5.2.18.Final'
-    testCompile 'com.h2database:h2:1.4.199'
+
+    testImplementation(platform("org.junit:junit-bom:5.8.2"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher") {
+        because("Only needed to run tests in a version of IntelliJ IDEA that bundles older versions")
+    }
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.vintage:junit-vintage-engine:5.8.2'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    testImplementation "ch.qos.logback:logback-classic:1.2.10"
+    testImplementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
+    testImplementation 'org.hibernate:hibernate-core:5.4.33'
+    testImplementation 'com.h2database:h2:1.4.199'
+}
+
+test {
+    useJUnitPlatform {
+        //includeTags("fast", "smoke & feature-a")
+        // excludeTags("slow", "ci")
+        //includeEngines("junit-jupiter")
+        includeEngines("junit-vintage")
+        // excludeEngines("junit-vintage")
+    }
 }
 
 publishing {
