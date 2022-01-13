@@ -39,7 +39,6 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
     testImplementation 'junit:junit:4.12'
-    testImplementation "ch.qos.logback:logback-classic:1.1.7"
     testImplementation "ch.qos.logback:logback-classic:1.2.3"
     testImplementation 'javax.xml.bind:jaxb-api:1.0'
     testImplementation 'org.hibernate:hibernate-core:5.4.33'
