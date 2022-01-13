@@ -15,9 +15,9 @@ import org.junit.runners.Parameterized.Parameters
  */
 @RunWith(Parameterized::class)
 class AbstractDialectTest(
-    val query: String,
-    val expectedCount: Int,
-    val expectedParams: List<String>
+    private val query: String,
+    private val expectedCount: Int,
+    private val expectedParams: List<String>
 ) : AbstractDialect() {
 
     companion object {
@@ -26,12 +26,12 @@ class AbstractDialectTest(
         fun data(): Collection<Array<Any>> {
             return listOf(
                 arrayOf("", 0, emptyList<Any>()),
-                    arrayOf("select 1 from dual where 1 = 1", 0, emptyList<Any>()),
-                    arrayOf("select 1 from dual where 1 = :a", 1, listOf("a")),
-                    arrayOf("select 1 from dual where 1 = :a and 2 = :b", 2, listOf("a", "b")),
-                    arrayOf("select 1 from dual where 1 = upper(:a) and 2 = :b", 2, listOf("a", "b")),
-                    arrayOf("select 1 from dual where 1 = upper(:a||'%') and 2 = :b", 2, listOf("a", "b")),
-                    arrayOf("select 1 from dual where 1 = upper(:a.b.c||'%')", 1, listOf("a.b.c"))
+                arrayOf("select 1 from dual where 1 = 1", 0, emptyList<Any>()),
+                arrayOf("select 1 from dual where 1 = :a", 1, listOf("a")),
+                arrayOf("select 1 from dual where 1 = :a and 2 = :b", 2, listOf("a", "b")),
+                arrayOf("select 1 from dual where 1 = upper(:a) and 2 = :b", 2, listOf("a", "b")),
+                arrayOf("select 1 from dual where 1 = upper(:a||'%') and 2 = :b", 2, listOf("a", "b")),
+                arrayOf("select 1 from dual where 1 = upper(:a.b.c||'%')", 1, listOf("a.b.c"))
             )
         }
     }

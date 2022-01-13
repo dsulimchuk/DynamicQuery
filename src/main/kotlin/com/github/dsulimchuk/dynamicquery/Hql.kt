@@ -91,7 +91,7 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
 
     //return null if there is no sense to do a query
     private fun selectTotal(dsl: QueryDsl<T>, em: EntityManager, limit: Int?, offset: Int?): Long? {
-        if (offset ?: 0 == 0 && limit == null) return null
+        if ((offset ?: 0) == 0 && limit == null) return null
 
         return em.createQuery(dsl.prepareText(QueryDsl.COUNT_ALL_PROJECTION_NAME))
             .setAllQueryParameters(dsl)
@@ -127,7 +127,7 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
         return query.resultList
     }
 
-    private fun Hql<T, R>.makeDsl(parameter: T): QueryDsl<T> {
+    private fun makeDsl(parameter: T): QueryDsl<T> {
         val dsl = QueryDsl(parameter)
         dsl.initQueryDsl()
         return dsl

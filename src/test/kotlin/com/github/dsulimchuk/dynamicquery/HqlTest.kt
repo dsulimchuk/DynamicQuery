@@ -4,7 +4,6 @@ import com.github.dsulimchuk.dynamicquery.core.QueryParsingException
 import com.github.dsulimchuk.dynamicquery.hibernate.StatementInspectorImpl
 import com.github.dsulimchuk.dynamicquery.testmodel.Service
 import com.github.dsulimchuk.dynamicquery.testmodel.dto.UserWithService
-import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.*
 import org.hibernate.annotations.QueryHints
 import org.junit.After
@@ -278,7 +277,7 @@ class HqlTest {
 
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(4))
-        assertThat(result, CoreMatchers.everyItem(CoreMatchers.instanceOf(Service::class.java)))
+        assertThat(result, everyItem(instanceOf(Service::class.java)))
         assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
     }
 
@@ -289,7 +288,7 @@ class HqlTest {
 
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(3))
-        assertThat(result, CoreMatchers.everyItem(CoreMatchers.instanceOf(String::class.java)))
+        assertThat(result, everyItem(instanceOf(String::class.java)))
         assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
     }
 
@@ -301,7 +300,7 @@ class HqlTest {
 
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(4))
-        assertThat(result, CoreMatchers.everyItem(CoreMatchers.instanceOf(UserWithService::class.java)))
+        assertThat(result, everyItem(instanceOf(UserWithService::class.java)))
         assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
     }
 
