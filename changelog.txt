@@ -37,3 +37,9 @@ Changes in 1.0.7 (June 10, 2021)
 ** Improvement
     * Actualize dependencies
     * Gradle version up
+
+Changes in 1.0.8 (January 13, 2022)
+------------------------------------------------------------------------------------------------------------------------
+** Improvement
+    * Actualize dependencies
+    * Gradle version up
