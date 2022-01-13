@@ -10,7 +10,7 @@ import java.util.*
  */
 class QueryDsl<T : Any>(val parameter: T) {
     companion object : KLogging() {
-        val COUNT_ALL_PROJECTION_NAME = "countAllProjection"
+        const val COUNT_ALL_PROJECTION_NAME = "countAllProjection"
     }
 
     var sourceQuery: String = ""

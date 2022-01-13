@@ -14,17 +14,18 @@ import org.junit.runners.Parameterized.Parameters
  * *         created 27/10/16
  */
 @RunWith(Parameterized::class)
-class AbstractDialectQueryDslParametersTest(
-        val query: String,
-        val expectedCount: Int,
-        val expectedParams: List<String>) : AbstractDialect() {
+class AbstractDialectTest(
+    val query: String,
+    val expectedCount: Int,
+    val expectedParams: List<String>
+) : AbstractDialect() {
 
     companion object {
         @Parameters(name = "{index}: fib({0})={1}")
         @JvmStatic
         fun data(): Collection<Array<Any>> {
             return listOf(
-                    arrayOf("", 0, emptyList<Any>()),
+                arrayOf("", 0, emptyList<Any>()),
                     arrayOf("select 1 from dual where 1 = 1", 0, emptyList<Any>()),
                     arrayOf("select 1 from dual where 1 = :a", 1, listOf("a")),
                     arrayOf("select 1 from dual where 1 = :a and 2 = :b", 2, listOf("a", "b")),

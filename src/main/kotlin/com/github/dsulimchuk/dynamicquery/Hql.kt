@@ -2,7 +2,7 @@ package com.github.dsulimchuk.dynamicquery
 
 import com.github.dsulimchuk.dynamicquery.core.QueryDsl
 import mu.KLogging
-import org.springframework.beans.BeanUtils
+import org.apache.commons.beanutils.PropertyUtils
 import javax.persistence.EntityManager
 import javax.persistence.Query
 import javax.persistence.TypedQuery
@@ -21,8 +21,8 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
         val dsl = makeDsl(parameter)
 
         return em
-                .createQuery(dsl.prepareText(null))
-                .setAllQueryParameters(dsl)
+            .createQuery(dsl.prepareText(null))
+            .setAllQueryParameters(dsl)
     }
 
     /**
@@ -32,35 +32,39 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
         val dsl = makeDsl(parameter)
 
         return em
-                .createQuery(dsl.prepareText(projection))
-                .setAllQueryParameters(dsl)
+            .createQuery(dsl.prepareText(projection))
+            .setAllQueryParameters(dsl)
     }
 
     /**
      * Prepare typed query
      */
-    fun prepareTyped(em: EntityManager,
-                     resultClass: Class<R>,
-                     parameter: T): TypedQuery<R> {
+    fun prepareTyped(
+        em: EntityManager,
+        resultClass: Class<R>,
+        parameter: T
+    ): TypedQuery<R> {
         val dsl = makeDsl(parameter)
 
         return em
-                .createQuery(dsl.prepareText(null), resultClass)
-                .setAllQueryParameters(dsl)
+            .createQuery(dsl.prepareText(null), resultClass)
+            .setAllQueryParameters(dsl)
     }
 
     /**
      * Prepare typed query with specific projection
      */
-    fun <RR : Any, TT : T> prepareTyped(em: EntityManager,
-                                      resultClass: Class<RR>,
-                                      parameter: TT,
-                                      projection: String): TypedQuery<RR> {
+    fun <RR : Any, TT : T> prepareTyped(
+        em: EntityManager,
+        resultClass: Class<RR>,
+        parameter: TT,
+        projection: String
+    ): TypedQuery<RR> {
         val dsl = makeDsl(parameter)
 
         return em
-                .createQuery(dsl.prepareText(projection), resultClass)
-                .setAllQueryParameters(dsl)
+            .createQuery(dsl.prepareText(projection), resultClass)
+            .setAllQueryParameters(dsl)
     }
 
     /**
@@ -69,12 +73,13 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
      * if (limit == 0 || countQuery return 0) -> data query not executed
      * @return paged data with total rows count
      */
-    fun execute(em: EntityManager,
-                resultClass: Class<R>,
-                parameter: T,
-                offset: Int? = null,
-                limit: Int? = null,
-                additionalParams: (query: TypedQuery<R>) -> Unit = { }
+    fun execute(
+        em: EntityManager,
+        resultClass: Class<R>,
+        parameter: T,
+        offset: Int? = null,
+        limit: Int? = null,
+        additionalParams: (query: TypedQuery<R>) -> Unit = { }
     ): QueryResult<R> {
         val dsl = makeDsl(parameter)
 
@@ -89,23 +94,25 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
         if (offset ?: 0 == 0 && limit == null) return null
 
         return em.createQuery(dsl.prepareText(QueryDsl.COUNT_ALL_PROJECTION_NAME))
-                .setAllQueryParameters(dsl)
-                .singleResult as Long
+            .setAllQueryParameters(dsl)
+            .singleResult as Long
     }
 
-    private fun selectData(dsl: QueryDsl<T>,
-                           em: EntityManager,
-                           offset: Int?,
-                           limit: Int?,
-                           total: Long?,
-                           resultClass: Class<R>,
-                           additionalParams: (query: TypedQuery<R>) -> Unit): List<R> {
+    private fun selectData(
+        dsl: QueryDsl<T>,
+        em: EntityManager,
+        offset: Int?,
+        limit: Int?,
+        total: Long?,
+        resultClass: Class<R>,
+        additionalParams: (query: TypedQuery<R>) -> Unit
+    ): List<R> {
         //if we already know that there are no results -> exit
         if (total == 0L || limit == 0) return emptyList()
 
         val query = em
-                .createQuery(dsl.prepareText(), resultClass)
-                .setAllQueryParameters(dsl)
+            .createQuery(dsl.prepareText(), resultClass)
+            .setAllQueryParameters(dsl)
 
         additionalParams(query)
 
@@ -134,26 +141,13 @@ class Hql<T : Any, R : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : Abstract
             this.setParameter(allParameters.first(), dsl.parameter)
         } else {
             allParameters
-                    .map { it to getProperty(dsl.parameter, it.replace("_", "."))                            }
-                    .forEach {
-                        logger.debug { "set parameter ${it.first} to ${it.second}" }
-                        this.setParameter(it.first, it.second)
-                    }
+                .map { it to PropertyUtils.getProperty(dsl.parameter, it.replace("_", ".")) }
+                .forEach {
+                    logger.debug { "set parameter ${it.first} to ${it.second}" }
+                    this.setParameter(it.first, it.second)
+                }
         }
         return this
     }
 
-    private fun getProperty(parameter: Any, paramName:String):Any? {
-        return if (paramName.contains('.')) {
-            val (highParam, internalParam) = paramName.split('.',limit  = 2)
-            var paramValue =
-                BeanUtils.getPropertyDescriptor(parameter::class.javaObjectType, highParam)?.readMethod?.invoke(parameter)
-            if ((paramValue != null) && (internalParam != null)) {
-                paramValue = getProperty(paramValue, internalParam)
-            }
-            return paramValue
-        }
-        else
-            BeanUtils.getPropertyDescriptor(parameter::class.javaObjectType, paramName)?.readMethod?.invoke(parameter)
-    }
 }

@@ -21,8 +21,8 @@ import javax.persistence.Persistence
  * *         created 26/10/16
  */
 class HqlTest {
-    val sessionFactory: EntityManagerFactory = Persistence.createEntityManagerFactory("test")
-    val em: EntityManager = sessionFactory.createEntityManager()
+    private val sessionFactory: EntityManagerFactory = Persistence.createEntityManagerFactory("test")
+    private val em: EntityManager = sessionFactory.createEntityManager()
 
     @Before
     fun setUp() {
@@ -296,7 +296,8 @@ class HqlTest {
     @Test
     fun testQueryUserWithServiceProjection() {
         StatementInspectorImpl.reset()
-        val result: MutableList<UserWithService> = dslWithProjections.prepareTyped(em, UserWithService::class.java, listOf(1L, 2, 3, 5), "userWithService").resultList
+        val result: MutableList<UserWithService> = dslWithProjections
+            .prepareTyped(em, UserWithService::class.java, listOf(1L, 2, 3, 5), "userWithService").resultList
 
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(4))
