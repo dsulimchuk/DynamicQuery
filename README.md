@@ -1,11 +1,10 @@
 # Dynamic Query DSL for JPA (Hibernate) on Kotlin
 
-[![Build Status](https://www.travis-ci.com/dsulimchuk/DynamicQuery.svg?branch=master)](https://www.travis-ci.com/dsulimchuk/DynamicQuery)
+[![CircleCI](https://circleci.com/gh/dsulimchuk/DynamicQuery.svg?style=svg)](https://app.circleci.com/pipelines/github/dsulimchuk/DynamicQuery)
 
-This project intends to simplify maintenance of sql queries.
-What if you want to write a query that can be developed in another IDE (db specific)
-and have opportunity to add dynamic predicates?
-Now you can do it - just look:
+This project intends to simplify maintenance of sql queries. What if you want to write a query that can be developed in
+another IDE (db specific)
+and have opportunity to add dynamic predicates? Now you can do it - just look:
 
 ``` kotlin
    //first of all we declare a function that accept searchCriteria (any data class)
