@@ -1,47 +1,30 @@
-group 'com.github.dsulimchuk.dynamicquery'
-version '1.0.8-SNAPSHOT'
-
-buildscript {
-    ext.kotlin_version = '1.5.32'
-    ext.dokka_version = "1.5.31"
-    ext.detekt_version = '1.0.0.RC6-4'
-
-    repositories {
-        mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
-        classpath "gradle.plugin.io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${detekt_version}"
-    }
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.32'
+    id 'jacoco'
+    id 'maven-publish'
+    id 'signing'
+    id 'org.jetbrains.dokka' version '1.6.10'
+    id 'io.gitlab.arturbosch.detekt' version '1.19.0'
 }
 
-apply plugin: 'java-library'
-apply plugin: 'kotlin'
-apply plugin: 'jacoco'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
-apply plugin: 'org.jetbrains.dokka'
-apply plugin: 'io.gitlab.arturbosch.detekt'
+group 'com.github.dsulimchuk.dynamicquery'
+version '1.0.8-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
     withJavadocJar()
     withSourcesJar()
 }
 
 detekt {
-    version = detekt_version
-    profile("main") {
-        input = "$projectDir/src/main/kotlin"
-        config = "$projectDir/detekt.yml"
-        filters = ".*test.*,.*/resources/.*,.*/tmp/.*"
-    }
+    config = files("$projectDir/detekt.yml")
 }
 
 signing {
@@ -49,35 +32,18 @@ signing {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.5.32"
     implementation "io.github.microutils:kotlin-logging-jvm:2.0.13"
     implementation "jakarta.persistence:jakarta.persistence-api:2.2.3"
-    implementation 'org.springframework:spring-beans:5.2.17.RELEASE'
+    implementation 'commons-beanutils:commons-beanutils:1.9.4'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
-
-    testImplementation(platform("org.junit:junit-bom:5.8.2"))
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher") {
-        because("Only needed to run tests in a version of IntelliJ IDEA that bundles older versions")
-    }
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-    testImplementation 'org.junit.vintage:junit-vintage-engine:5.8.2'
-    testImplementation 'org.hamcrest:hamcrest:2.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-    testImplementation "ch.qos.logback:logback-classic:1.2.10"
-    testImplementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
+    testImplementation 'junit:junit:4.12'
+    testImplementation "ch.qos.logback:logback-classic:1.1.7"
+    testImplementation "ch.qos.logback:logback-classic:1.2.3"
+    testImplementation 'javax.xml.bind:jaxb-api:1.0'
     testImplementation 'org.hibernate:hibernate-core:5.4.33'
     testImplementation 'com.h2database:h2:1.4.199'
-}
-
-test {
-    useJUnitPlatform {
-        //includeTags("fast", "smoke & feature-a")
-        // excludeTags("slow", "ci")
-        //includeEngines("junit-jupiter")
-        includeEngines("junit-vintage")
-        // excludeEngines("junit-vintage")
-    }
 }
 
 publishing {

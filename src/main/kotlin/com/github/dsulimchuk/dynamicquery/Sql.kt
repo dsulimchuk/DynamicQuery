@@ -2,7 +2,7 @@ package com.github.dsulimchuk.dynamicquery
 
 import com.github.dsulimchuk.dynamicquery.core.QueryDsl
 import mu.KLogging
-import org.springframework.beans.BeanUtils
+import org.apache.commons.beanutils.PropertyUtils
 import javax.persistence.EntityManager
 import javax.persistence.Query
 
@@ -10,8 +10,7 @@ import javax.persistence.Query
  * @author Dmitrii Sulimchuk
  * created 23/10/16
  */
-class Sql<T : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit)
-: AbstractDialect() {
+class Sql<T : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit) : AbstractDialect() {
     companion object : KLogging()
 
     /**
@@ -32,12 +31,11 @@ class Sql<T : Any>(val initQueryDsl: QueryDsl<T>.() -> Unit)
                 result.setParameter(allParameters[0], query.parameter)
             } else {
                 allParameters
-                        .map { it to BeanUtils.getPropertyDescriptor(query.parameter::class.javaObjectType, it)
-                            ?.readMethod?.invoke(query.parameter) }
-                        .forEach {
-                            logger.debug { "set parameter ${it.first} to ${it.second}" }
-                            result.setParameter(it.first, it.second)
-                        }
+                    .map { it to PropertyUtils.getProperty(query.parameter, it) }
+                    .forEach {
+                        logger.debug { "set parameter ${it.first} to ${it.second}" }
+                        result.setParameter(it.first, it.second)
+                    }
             }
         }
 

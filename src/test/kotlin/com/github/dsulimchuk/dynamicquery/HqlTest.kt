@@ -4,7 +4,6 @@ import com.github.dsulimchuk.dynamicquery.core.QueryParsingException
 import com.github.dsulimchuk.dynamicquery.hibernate.StatementInspectorImpl
 import com.github.dsulimchuk.dynamicquery.testmodel.Service
 import com.github.dsulimchuk.dynamicquery.testmodel.dto.UserWithService
-import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.*
 import org.hibernate.annotations.QueryHints
 import org.junit.After
@@ -21,8 +20,8 @@ import javax.persistence.Persistence
  * *         created 26/10/16
  */
 class HqlTest {
-    val sessionFactory: EntityManagerFactory = Persistence.createEntityManagerFactory("test")
-    val em: EntityManager = sessionFactory.createEntityManager()
+    private val sessionFactory: EntityManagerFactory = Persistence.createEntityManagerFactory("test")
+    private val em: EntityManager = sessionFactory.createEntityManager()
 
     @Before
     fun setUp() {
@@ -278,7 +277,7 @@ class HqlTest {
 
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(4))
-        assertThat(result, CoreMatchers.everyItem(CoreMatchers.instanceOf(Service::class.java)))
+        assertThat(result, everyItem(instanceOf(Service::class.java)))
         assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
     }
 
@@ -289,18 +288,19 @@ class HqlTest {
 
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(3))
-        assertThat(result, CoreMatchers.everyItem(CoreMatchers.instanceOf(String::class.java)))
+        assertThat(result, everyItem(instanceOf(String::class.java)))
         assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
     }
 
     @Test
     fun testQueryUserWithServiceProjection() {
         StatementInspectorImpl.reset()
-        val result: MutableList<UserWithService> = dslWithProjections.prepareTyped(em, UserWithService::class.java, listOf(1L, 2, 3, 5), "userWithService").resultList
+        val result: MutableList<UserWithService> = dslWithProjections
+            .prepareTyped(em, UserWithService::class.java, listOf(1L, 2, 3, 5), "userWithService").resultList
 
         assertThat(result, notNullValue())
         assertThat(result.size, equalTo(4))
-        assertThat(result, CoreMatchers.everyItem(CoreMatchers.instanceOf(UserWithService::class.java)))
+        assertThat(result, everyItem(instanceOf(UserWithService::class.java)))
         assertThat("must execute only 1 query", StatementInspectorImpl.queryCount(), equalTo(1))
     }
 
